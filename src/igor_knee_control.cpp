@@ -48,8 +48,6 @@ igor_knee_control::igor_knee_control(ros::NodeHandle* nodehandle):nh_(*nodehandl
     // k_l(0,1)= -1*k_r(0,1);
     // k_l(0,4)= -1*k_r(0,4);
 
-    // Test for git
-
     // Viscous friction matrix
     V_h(0,0) = 48.4376;  
     V_h(0,1) = 0;
