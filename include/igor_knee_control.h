@@ -118,9 +118,9 @@ private:
     const float lg1 = 0.3;
     const float lg2 = 0.3;
     const float I1 = 0.018; // Arm moment of inertia
-    const float I2 = 0.018; // Arm moment of inertia
+    const float I2 = 0.0339;//0.018; // Arm moment of inertia
     const float arm_m1 = 0.6; // Arm masses
-    const float arm_m2 = 0.6; // Arm masses
+    const float arm_m2 = 0.6+0.53; // Arm masses
 
     float CoG_angle = 0; 
     float leanAngle = 0; 
@@ -302,7 +302,7 @@ public:
     const int t3 = m3;
     // Derivate? 0: no derivation, 1: first derivative...
     const int d = 0;
-    double result;
+    //double result;
     gram_sg::SavitzkyGolayFilterConfig sg_conf1{m1,t1,n1,d,0.002}; // filter configuration
     gram_sg::SavitzkyGolayFilterConfig sg_conf2{m2,t2,n2,1,1}; // filter configuration
     gram_sg::SavitzkyGolayFilterConfig sg_conf3{m3,t3,n3,2,1}; // filter configuration

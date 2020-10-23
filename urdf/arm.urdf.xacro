@@ -32,7 +32,7 @@
 			<xacro:insert_block name="joint_pose"/>
 			<parent link="${prefix}_armActuator"/>
 			<child  link="${prefix}_arm"/>
-			<limit effort="5" lower="${-2}" upper="${2}" velocity="10"/>
+			<limit effort="25" lower="${-2}" upper="${2}" velocity="10"/>
 			<axis xyz="0 0 1"/>
 			<dynamics damping="0.1"/>
 		</joint>

@@ -101,7 +101,6 @@ igor_knee_control::igor_knee_control(ros::NodeHandle* nodehandle):nh_(*nodehandl
     plot_vector.data.resize(10); // Resizing std::msg array
 
     // Manipulator gains
-
     K_pos(0,0) = 18;
     K_pos(0,1) = 0;
     K_pos(1,0) = 0;
@@ -513,7 +512,7 @@ void igor_knee_control::ref_update()
         //ref_state(1) = M_PI/4*(cos(0.3*ros::Time::now().toSec())); // yaw
 
 
-        accl_d(0) = 8*0;
+        accl_d(0) = 8;
         accl_d(1) = 0;
 
     }

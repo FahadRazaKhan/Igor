@@ -7,6 +7,7 @@
 	<xacro:include filename="$(find igor)/urdf/upperleg.urdf.xacro" />
 	<xacro:include filename="$(find igor)/urdf/lowerleg.urdf.xacro" />
 	<xacro:include filename="$(find igor)/urdf/arm.urdf.xacro" />
+	<xacro:include filename="$(find igor)/urdf/my_hand.urdf.xacro" />
 
 
 	  <!-- Base Size -->
@@ -192,6 +193,11 @@
 	<xacro:igor_actuator prefix="Endeffector" reflect="1" parent_link="Fore_arm" flip="1">
 		<origin xyz="${lower_leg_length + actuator_z_size/2.3} ${0} ${actuator_y_size/1.2}" rpy="${M_PI/2} ${0} 0" />
 	</xacro:igor_actuator>
+
+	<!--Hand-->
+	<xacro:my_hand prefix="Arm1" parent_link= "EndeffectorActuator">
+		<origin xyz="${0} ${0} ${0}" rpy="${0} ${0} ${0}" />
+	</xacro:my_hand>
 
 	
 	<!--Robot Center Dummy-->

@@ -84,6 +84,118 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
+        H1_F1_base_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        H1_F1_link_1:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        H1_F1_link_2:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        H1_F1_optoforce:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        H1_F1_palm_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        H1_F1_tip:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        H1_F2_base_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        H1_F2_link_1:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        H1_F2_link_2:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        H1_F2_optoforce:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        H1_F2_palm_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        H1_F2_tip:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        H1_F3_base_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        H1_F3_link_1:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        H1_F3_link_2:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        H1_F3_optoforce:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        H1_F3_palm_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        H1_F3_tip:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        H1_base_attach:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        H1_base_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        H1_insert_F1:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        H1_insert_F2:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        H1_insert_F3:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        H1_wrist_attach:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
         L_baseActuator:
           Alpha: 1
           Show Axes: false
@@ -184,19 +296,166 @@ Visualization Manager:
       Value: true
       Visual Enabled: true
     - Class: rviz/TF
-      Enabled: false
+      Enabled: true
       Frame Timeout: 15
       Frames:
         All Enabled: false
-      Marker Scale: 1
+        EndeffectorActuator:
+          Value: false
+        Fore_arm:
+          Value: false
+        Fore_armActuator:
+          Value: false
+        H1_F1_base_link:
+          Value: false
+        H1_F1_link_1:
+          Value: false
+        H1_F1_link_2:
+          Value: false
+        H1_F1_optoforce:
+          Value: false
+        H1_F1_palm_link:
+          Value: false
+        H1_F1_tip:
+          Value: false
+        H1_F2_base_link:
+          Value: false
+        H1_F2_link_1:
+          Value: false
+        H1_F2_link_2:
+          Value: false
+        H1_F2_optoforce:
+          Value: false
+        H1_F2_palm_link:
+          Value: false
+        H1_F2_tip:
+          Value: false
+        H1_F3_base_link:
+          Value: false
+        H1_F3_link_1:
+          Value: false
+        H1_F3_link_2:
+          Value: false
+        H1_F3_optoforce:
+          Value: false
+        H1_F3_palm_link:
+          Value: false
+        H1_F3_tip:
+          Value: false
+        H1_base_attach:
+          Value: true
+        H1_base_link:
+          Value: false
+        H1_insert_F1:
+          Value: false
+        H1_insert_F2:
+          Value: false
+        H1_insert_F3:
+          Value: false
+        H1_wrist_attach:
+          Value: false
+        L_baseActuator:
+          Value: false
+        L_kneeActuator:
+          Value: false
+        L_lowerleg:
+          Value: false
+        L_upperleg:
+          Value: false
+        L_wheel:
+          Value: false
+        L_wheelActuator:
+          Value: false
+        R_baseActuator:
+          Value: false
+        R_kneeActuator:
+          Value: false
+        R_lowerleg:
+          Value: false
+        R_upperleg:
+          Value: false
+        R_wheel:
+          Value: false
+        R_wheelActuator:
+          Value: false
+        Upper_arm:
+          Value: false
+        Upper_armActuator:
+          Value: false
+        base_link:
+          Value: false
+        body_imu_link:
+          Value: false
+        center_imu_link:
+          Value: false
+        chassis:
+          Value: false
+        map:
+          Value: false
+        robot_center_link:
+          Value: false
+      Marker Scale: 0.5
       Name: TF
       Show Arrows: false
       Show Axes: true
       Show Names: false
       Tree:
-        {}
+        map:
+          base_link:
+            chassis:
+              L_baseActuator:
+                L_upperleg:
+                  L_kneeActuator:
+                    L_lowerleg:
+                      L_wheelActuator:
+                        L_wheel:
+                          {}
+                        robot_center_link:
+                          center_imu_link:
+                            {}
+              R_baseActuator:
+                R_upperleg:
+                  R_kneeActuator:
+                    R_lowerleg:
+                      R_wheelActuator:
+                        R_wheel:
+                          {}
+              Upper_armActuator:
+                Upper_arm:
+                  Fore_armActuator:
+                    Fore_arm:
+                      EndeffectorActuator:
+                        H1_base_attach:
+                          H1_wrist_attach:
+                            H1_base_link:
+                              H1_insert_F1:
+                                H1_F1_palm_link:
+                                  H1_F1_base_link:
+                                    H1_F1_link_1:
+                                      H1_F1_link_2:
+                                        H1_F1_tip:
+                                          H1_F1_optoforce:
+                                            {}
+                              H1_insert_F2:
+                                H1_F2_palm_link:
+                                  H1_F2_base_link:
+                                    H1_F2_link_1:
+                                      H1_F2_link_2:
+                                        H1_F2_tip:
+                                          H1_F2_optoforce:
+                                            {}
+                              H1_insert_F3:
+                                H1_F3_palm_link:
+                                  H1_F3_base_link:
+                                    H1_F3_link_1:
+                                      H1_F3_link_2:
+                                        H1_F3_tip:
+                                          H1_F3_optoforce:
+                                            {}
+              body_imu_link:
+                {}
       Update Interval: 0
-      Value: false
+      Value: true
     - Alpha: 1
       Class: rviz/PointStamped
       Color: 52; 101; 164
@@ -224,7 +483,7 @@ Visualization Manager:
           Scale: 1
           Value: true
         Value: true
-      Enabled: true
+      Enabled: false
       Keep: 1
       Name: Odometry
       Position Tolerance: 0.009999999776482582
@@ -240,13 +499,13 @@ Visualization Manager:
         Value: Arrow
       Topic: /igor/odom
       Unreliable: false
-      Value: true
+      Value: false
     - Class: rviz/Marker
       Enabled: true
       Marker Topic: /zram_marker
       Name: Marker
       Namespaces:
-        sphere_shape: true
+        {}
       Queue Size: 1
       Value: true
     - Class: rviz/Marker
@@ -254,7 +513,7 @@ Visualization Manager:
       Marker Topic: /support_marker
       Name: Marker
       Namespaces:
-        line_shape: true
+        {}
       Queue Size: 1
       Value: true
     - Alpha: 1
@@ -295,25 +554,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 5.473615646362305
+      Distance: 1.560798168182373
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -0.29783788323402405
-        Y: 0.320209801197052
-        Z: 0.30255764722824097
+        X: 0.5763134360313416
+        Y: -0.0779651626944542
+        Z: 0.7954676151275635
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.4147976338863373
+      Pitch: 0.41979631781578064
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 5.533438205718994
+      Yaw: 6.188446998596191
     Saved:
       - Class: rviz/Orbit
         Distance: 2.6209158897399902
