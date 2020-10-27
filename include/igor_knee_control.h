@@ -132,7 +132,7 @@ private:
     float CoM_acc_x;
     float CoM_acc_y;
     float CoM_acc_z;
-    float ground_level = 0;
+    float ground_level = 0.0;
     float alpha = 0;
 
 
@@ -294,7 +294,7 @@ public:
     // Polynomial Order
     const int n1 = 0;
     const int n2 = 1;
-    const int n3 = 3;
+    const int n3 = 2;
     // Initial Point Smoothing (ie evaluate polynomial at first point in the window)
     // Points are defined in range [-m;m]
     const int t1 = m1;
@@ -313,8 +313,6 @@ public:
     gram_sg::SavitzkyGolayFilter f5{sg_conf3};
     gram_sg::SavitzkyGolayFilter pitch_vel_filt{sg_conf1};
     gram_sg::SavitzkyGolayFilter yaw_vel_filt{sg_conf1};
-    //gram_sg::SavitzkyGolayFilter trq_r_filt{sg_conf1};
-    //gram_sg::SavitzkyGolayFilter trq_l_filt{sg_conf1};
     
     boost::circular_buffer<double> rightTrqVector {boost::circular_buffer<double>((2*m1+1),0)}; // Initialize with 0
     boost::circular_buffer<double> leftTrqVector {boost::circular_buffer<double>((2*m1+1),0)}; // Initialize with 0

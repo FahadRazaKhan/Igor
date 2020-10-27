@@ -91,7 +91,7 @@ igor_knee_control::igor_knee_control(ros::NodeHandle* nodehandle):nh_(*nodehandl
 
     // Reference states
     ref_state(0) = 0; // Center Position 
-    ref_state(1) = 0*(0.785398); // Yaw
+    ref_state(1) = 0; // Yaw
     ref_state(2) = 0.0; // Beta
     ref_state(3) = 0; // Center velocity
     ref_state(4) = 0; // yaw velocity
@@ -205,7 +205,7 @@ void igor_knee_control::odom_callback(const nav_msgs::Odometry::ConstPtr &msg)
     //ROS_INFO("Igor Position: %f",igor_center_position);
 
     //plot_vector.data[0] = igor_state(0);
-    plot_vector.data[6] = igor_state(3);
+    //plot_vector.data[6] = igor_state(3);
     
     plot_vector.data[9] = igor_pos_y;
 
@@ -253,14 +253,14 @@ void igor_knee_control::CoG_callback(const geometry_msgs::PointStamped::ConstPtr
     //*** ZRAM Part ***////
     try
     { 
-        transformStamped = tfBuffer.lookupTransform("map", "robot_center_link" , ros::Time(0));
+        transformStamped = tfBuffer.lookupTransform("map", "base_link" , ros::Time(0)); // CoG_Position is being published in the base_link by cog_publisher
     }
     catch (tf2::TransformException &ex) 
     {
         ROS_WARN("%s",ex.what());
     }
     
-    tf2::doTransform(CoG_Position, CoG_Position, transformStamped); // Transform from robot_center_link to map
+    tf2::doTransform(CoG_Position, CoG_Position, transformStamped); // Transform from base_link to map
     
     CoM_pos << (CoG_Position.x), (CoG_Position.y), (CoG_Position.z); // Eigen 3d vector of CoM position in map frame
 
@@ -277,7 +277,8 @@ void igor_knee_control::CoG_callback(const geometry_msgs::PointStamped::ConstPtr
     CoM_accl << (CoM_acc_x), (CoM_acc_y), (CoM_acc_z);
 
     //std::cout << "CoM_acceleration" << std::endl << CoM_accl << std::endl;
-
+    //std::cout << "Gravity Vector:" << std::endl << gravity_vec << std::endl;
+    
     f = CoM_accl - gravity_vec; // Contact forces
 
     alpha = (ground_level - CoG_Position.z) / f.z();
@@ -304,9 +305,6 @@ void igor_knee_control::CoG_callback(const geometry_msgs::PointStamped::ConstPtr
     
 
     CoG_angle_filtered = f1.filter(my_data1, 0);
-
-    // my_data2.push_back(CoG_angle_filtered);
-    // CoG_angle_vel = (f2.filter(my_data2,0))/0.002;
  
  
 
@@ -317,6 +315,8 @@ void igor_knee_control::CoG_callback(const geometry_msgs::PointStamped::ConstPtr
     //igor_state(5) = CoG_angle_vel;
  
     plot_vector.data[4] = igor_state(2);
+    plot_vector.data[5] = CoM_acc_x;
+    plot_vector.data[6] = CoM_acc_y;
 
     //this->lqr_controller(igor_state);
     //this->CT_controller(igor_state);
@@ -507,18 +507,18 @@ void igor_knee_control::ref_update()
 
 
     if (sim_time.toSec()>=10 && sim_time.toSec()<=10.8){
-        ref_state(0) = 0; // forward position
+        ref_state(0) = 1; // forward position
         //ref_state(0) = 0.5*(sin(0.7*ros::Time::now().toSec())); // forward position
         //ref_state(1) = M_PI/4*(cos(0.3*ros::Time::now().toSec())); // yaw
 
 
-        accl_d(0) = 8;
-        accl_d(1) = 0;
+        accl_d(0) = 0; // Endeffector X acceleration
+        accl_d(1) = 0; // Endeffector Y acceleration
 
     }
     else{
         
-        ref_state(0) = 0.0; // forward position
+        ref_state(0) = 1; // forward position
         ref_state(1) = 0.0; // yaw
         
         EE_pos_ref(0) = 0.3; // End-effector X reference
@@ -526,8 +526,8 @@ void igor_knee_control::ref_update()
         EE_vel_ref(0) = 0; // End-effector X velocity reference
         EE_vel_ref(1) = 0; // End-effector Y velocity reference
 
-        accl_d(0) = 0;
-        accl_d(1) = 0;
+        accl_d(0) = 0; // Endeffector X acceleration
+        accl_d(1) = 0; // Endeffector Y acceleration
     }
     
     knee_ref.data = 0*2.0*abs(sin(0.3*ros::Time::now().toSec()));
@@ -535,7 +535,7 @@ void igor_knee_control::ref_update()
 
     //plot_vector.data[1] = ref_state(0);
     plot_vector.data[3] = ref_state(1);
-    plot_vector.data[5] = ref_state(2); 
+    //plot_vector.data[5] = ref_state(2); 
     
 }// End of ref_update function
 

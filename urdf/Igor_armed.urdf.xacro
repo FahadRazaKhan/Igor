@@ -8,6 +8,7 @@
 	<xacro:include filename="$(find igor)/urdf/lowerleg.urdf.xacro" />
 	<xacro:include filename="$(find igor)/urdf/arm.urdf.xacro" />
 	<xacro:include filename="$(find igor)/urdf/my_hand.urdf.xacro" />
+	<xacro:include filename="$(find igor)/urdf/pepsi_can.urdf.xacro" />
 
 
 	  <!-- Base Size -->
@@ -198,6 +199,11 @@
 	<xacro:my_hand prefix="Arm1" parent_link= "EndeffectorActuator">
 		<origin xyz="${0} ${0} ${0}" rpy="${0} ${0} ${0}" />
 	</xacro:my_hand>
+
+	<!--Pepsi Can  -->
+	<xacro:pepsi_can parent_link= "H1_base_link">
+		<origin xyz="${0.0} ${0} ${0.062}" rpy="${0} ${0} ${0}" />
+	</xacro:pepsi_can>
 
 	
 	<!--Robot Center Dummy-->

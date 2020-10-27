@@ -48,7 +48,7 @@
 			<visual>
 				<origin rpy="${0} ${0} ${0}" xyz="${0} ${0} ${0}"/>
 				<geometry>
-					<mesh filename="package://fh_desc/meshes/v2/palm_link_simple.dae" scale="0.5 0.5 0.5"/>
+					<mesh filename="package://igor/meshes/palm_link_simple.dae" scale="0.5 0.5 0.5"/>
 				</geometry>
 				<material name="light_grey">
 					<color rgba="0.75 0.75 0.75 1.0"/>
@@ -58,7 +58,7 @@
 			<collision>
 				<origin rpy="0 0 0" xyz="0 0 0"/>
 				<geometry>
-					<mesh filename="package://fh_desc/meshes/v2/palm_link_simple.dae" scale="0.5 0.5 0.5"/>
+					<mesh filename="package://igor/meshes/palm_link_simple.dae" scale="0.5 0.5 0.5"/>
 				</geometry>
 				<material name="light_grey">
 					<color rgba="0.75 0.75 0.75 1.0"/>
@@ -109,7 +109,7 @@
 		    <visual>
 		      <origin rpy="0 0 0" xyz="0 0 0"/>
 		      <geometry>
-			<mesh filename="package://fh_desc/meshes/v2/finger_palm_link.dae" scale="0.5 0.5 0.5"/>
+			<mesh filename="package://igor/meshes/finger_palm_link.dae" scale="0.5 0.5 0.5"/>
 		      </geometry>
 		      <material name="light_grey">
 			<color rgba="0.75 0.75 0.75 1.0"/>
@@ -130,7 +130,7 @@
 		    <visual>
 		      <origin rpy="0 0 0" xyz="0 0 0"/>
 		      <geometry>
-			<mesh filename="package://fh_desc/meshes/v2/finger_base_link_simple.dae" scale="0.5 0.5 0.5"/>
+			<mesh filename="package://igor/meshes/finger_base_link_simple.dae" scale="0.5 0.5 0.5"/>
 		      </geometry>
 		      <material name="light_grey">
 			<color rgba="0.75 0.75 0.75 1.0"/>
@@ -139,7 +139,7 @@
 		    <collision>
 		      <origin rpy="0 0 0" xyz="0 0 0"/>
 		      <geometry>
-			<mesh filename="package://fh_desc/meshes/v2/finger_base_link_simple.dae" scale="0.5 0.5 0.5"/>
+			<mesh filename="package://igor/meshes/finger_base_link_simple.dae" scale="0.5 0.5 0.5"/>
 		      </geometry>
 		      <material name="light_grey">
 			<color rgba="0.75 0.75 0.75 1.0"/>
@@ -155,7 +155,7 @@
 		    <visual>
 		      <origin rpy="0 0 0" xyz="0 0 0"/>
 		      <geometry>
-			<mesh filename="package://fh_desc/meshes/v2/finger_prox_link_simple.dae" scale="0.5 0.5 0.5"/>
+			<mesh filename="package://igor/meshes/finger_prox_link_simple.dae" scale="0.5 0.5 0.5"/>
 		      </geometry>
 		      <material name="light_grey">
 			<color rgba="0.75 0.75 0.75 1.0"/>
@@ -164,7 +164,7 @@
 		    <collision>
 		      <origin rpy="0 0 0" xyz="0 0 0"/>
 		      <geometry>
-			<mesh filename="package://fh_desc/meshes/v2/finger_prox_link_simple.dae" scale="0.5 0.5 0.5"/>
+			<mesh filename="package://igor/meshes/finger_prox_link_simple.dae" scale="0.5 0.5 0.5"/>
 		      </geometry>
 		      <material name="light_grey">
 			<color rgba="0.75 0.75 0.75 1.0"/>
@@ -180,7 +180,7 @@
 		    <visual>
 		      <origin rpy="0 0 0" xyz="0 0 0"/>
 		      <geometry>
-			<mesh filename="package://fh_desc/meshes/v2/finger_dist_link_simple.dae" scale="0.5 0.5 0.5"/>
+			<mesh filename="package://igor/meshes/finger_dist_link_simple.dae" scale="0.5 0.5 0.5"/>
 		      </geometry>
 		      <material name="light_grey">
 			<color rgba="0.75 0.75 0.75 1.0"/>
@@ -189,7 +189,7 @@
 		    <collision>
 		      <origin rpy="0 0 0" xyz="0 0 0"/>
 		      <geometry>
-			<mesh filename="package://fh_desc/meshes/v2/finger_dist_link_simple.dae" scale="0.5 0.5 0.5"/>
+			<mesh filename="package://igor/meshes/finger_dist_link_simple.dae" scale="0.5 0.5 0.5"/>
 		      </geometry>
 		      <material name="light_grey">
 			<color rgba="0.75 0.75 0.75 1.0"/>
@@ -263,7 +263,7 @@
 		    <visual>
 		      <origin rpy="0 0 0" xyz="0 0 0"/>
 		      <geometry>
-			<mesh filename="package://fh_desc/meshes/omd-d18-tip.dae" scale="0.5 0.5 0.5"/>
+			<mesh filename="package://igor/meshes/omd-d18-tip.dae" scale="0.5 0.5 0.5"/>
 		      </geometry>
 		      <material name="light_grey">
 			<color rgba="0.75 0.75 0.75 1.0"/>
@@ -272,7 +272,7 @@
 		    <collision>
 		      <origin rpy="0 0 0" xyz="0 0 0"/>
 		      <geometry>
-			<mesh filename="package://fh_desc/meshes/omd-d18-tip.dae" scale="0.5 0.5 0.5"/>
+			<mesh filename="package://igor/meshes/omd-d18-tip.dae" scale="0.5 0.5 0.5"/>
 		      </geometry>
 		      <material name="light_grey">
 			<color rgba="0.75 0.75 0.75 1.0"/>
@@ -298,7 +298,7 @@
 		    <visual>
 		      <origin rpy="0 0 0" xyz="0 0 0"/>
 		      <geometry>
-			<mesh filename="package://fh_desc/meshes/v2/finger_palm_link.dae" scale="0.5 0.5 0.5"/>
+			<mesh filename="package://igor/meshes/finger_palm_link.dae" scale="0.5 0.5 0.5"/>
 		      </geometry>
 		      <material name="light_grey">
 			<color rgba="0.75 0.75 0.75 1.0"/>
@@ -319,7 +319,7 @@
 		    <visual>
 		      <origin rpy="0 0 0" xyz="0 0 0"/>
 		      <geometry>
-			<mesh filename="package://fh_desc/meshes/v2/finger_base_link_simple.dae" scale="0.5 0.5 0.5"/>
+			<mesh filename="package://igor/meshes/finger_base_link_simple.dae" scale="0.5 0.5 0.5"/>
 		      </geometry>
 		      <material name="light_grey">
 			<color rgba="0.75 0.75 0.75 1.0"/>
@@ -328,7 +328,7 @@
 		    <collision>
 		      <origin rpy="0 0 0" xyz="0 0 0"/>
 		      <geometry>
-			<mesh filename="package://fh_desc/meshes/v2/finger_base_link_simple.dae" scale="0.5 0.5 0.5"/>
+			<mesh filename="package://igor/meshes/finger_base_link_simple.dae" scale="0.5 0.5 0.5"/>
 		      </geometry>
 		      <material name="light_grey">
 			<color rgba="0.75 0.75 0.75 1.0"/>
@@ -344,7 +344,7 @@
 		    <visual>
 		      <origin rpy="0 0 0" xyz="0 0 0"/>
 		      <geometry>
-			<mesh filename="package://fh_desc/meshes/v2/finger_prox_link_simple.dae" scale="0.5 0.5 0.5"/>
+			<mesh filename="package://igor/meshes/finger_prox_link_simple.dae" scale="0.5 0.5 0.5"/>
 		      </geometry>
 		      <material name="light_grey">
 			<color rgba="0.75 0.75 0.75 1.0"/>
@@ -353,7 +353,7 @@
 		    <collision>
 		      <origin rpy="0 0 0" xyz="0 0 0"/>
 		      <geometry>
-			<mesh filename="package://fh_desc/meshes/v2/finger_prox_link_simple.dae" scale="0.5 0.5 0.5"/>
+			<mesh filename="package://igor/meshes/finger_prox_link_simple.dae" scale="0.5 0.5 0.5"/>
 		      </geometry>
 		      <material name="light_grey">
 			<color rgba="0.75 0.75 0.75 1.0"/>
@@ -369,7 +369,7 @@
 		    <visual>
 		      <origin rpy="0 0 0" xyz="0 0 0"/>
 		      <geometry>
-			<mesh filename="package://fh_desc/meshes/v2/finger_dist_link_simple.dae" scale="0.5 0.5 0.5"/>
+			<mesh filename="package://igor/meshes/finger_dist_link_simple.dae" scale="0.5 0.5 0.5"/>
 		      </geometry>
 		      <material name="light_grey">
 			<color rgba="0.75 0.75 0.75 1.0"/>
@@ -378,7 +378,7 @@
 		    <collision>
 		      <origin rpy="0 0 0" xyz="0 0 0"/>
 		      <geometry>
-			<mesh filename="package://fh_desc/meshes/v2/finger_dist_link_simple.dae" scale="0.5 0.5 0.5"/>
+			<mesh filename="package://igor/meshes/finger_dist_link_simple.dae" scale="0.5 0.5 0.5"/>
 		      </geometry>
 		      <material name="light_grey">
 			<color rgba="0.75 0.75 0.75 1.0"/>
@@ -452,7 +452,7 @@
 		    <visual>
 		      <origin rpy="0 0 0" xyz="0 0 0"/>
 		      <geometry>
-			<mesh filename="package://fh_desc/meshes/omd-d18-tip.dae" scale="0.5 0.5 0.5"/>
+			<mesh filename="package://igor/meshes/omd-d18-tip.dae" scale="0.5 0.5 0.5"/>
 		      </geometry>
 		      <material name="light_grey">
 			<color rgba="0.75 0.75 0.75 1.0"/>
@@ -461,7 +461,7 @@
 		    <collision>
 		      <origin rpy="0 0 0" xyz="0 0 0"/>
 		      <geometry>
-			<mesh filename="package://fh_desc/meshes/omd-d18-tip.dae" scale="0.5 0.5 0.5"/>
+			<mesh filename="package://igor/meshes/omd-d18-tip.dae" scale="0.5 0.5 0.5"/>
 		      </geometry>
 		      <material name="light_grey">
 			<color rgba="0.75 0.75 0.75 1.0"/>
@@ -487,7 +487,7 @@
 		    <visual>
 		      <origin rpy="0 0 0" xyz="0 0 0"/>
 		      <geometry>
-			<mesh filename="package://fh_desc/meshes/v2/finger_palm_link.dae" scale="0.5 0.5 0.5"/>
+			<mesh filename="package://igor/meshes/finger_palm_link.dae" scale="0.5 0.5 0.5"/>
 		      </geometry>
 		      <material name="light_grey">
 			<color rgba="0.75 0.75 0.75 1.0"/>
@@ -508,7 +508,7 @@
 		    <visual>
 		      <origin rpy="0 0 0" xyz="0 0 0"/>
 		      <geometry>
-			<mesh filename="package://fh_desc/meshes/v2/finger_base_link_simple.dae" scale="0.5 0.5 0.5"/>
+			<mesh filename="package://igor/meshes/finger_base_link_simple.dae" scale="0.5 0.5 0.5"/>
 		      </geometry>
 		      <material name="light_grey">
 			<color rgba="0.75 0.75 0.75 1.0"/>
@@ -517,7 +517,7 @@
 		    <collision>
 		      <origin rpy="0 0 0" xyz="0 0 0"/>
 		      <geometry>
-			<mesh filename="package://fh_desc/meshes/v2/finger_base_link_simple.dae" scale="0.5 0.5 0.5"/>
+			<mesh filename="package://igor/meshes/finger_base_link_simple.dae" scale="0.5 0.5 0.5"/>
 		      </geometry>
 		      <material name="light_grey">
 			<color rgba="0.75 0.75 0.75 1.0"/>
@@ -533,7 +533,7 @@
 		    <visual>
 		      <origin rpy="0 0 0" xyz="0 0 0"/>
 		      <geometry>
-			<mesh filename="package://fh_desc/meshes/v2/finger_prox_link_simple.dae" scale="0.5 0.5 0.5"/>
+			<mesh filename="package://igor/meshes/finger_prox_link_simple.dae" scale="0.5 0.5 0.5"/>
 		      </geometry>
 		      <material name="light_grey">
 			<color rgba="0.75 0.75 0.75 1.0"/>
@@ -542,7 +542,7 @@
 		    <collision>
 		      <origin rpy="0 0 0" xyz="0 0 0"/>
 		      <geometry>
-			<mesh filename="package://fh_desc/meshes/v2/finger_prox_link_simple.dae" scale="0.5 0.5 0.5"/>
+			<mesh filename="package://igor/meshes/finger_prox_link_simple.dae" scale="0.5 0.5 0.5"/>
 		      </geometry>
 		      <material name="light_grey">
 			<color rgba="0.75 0.75 0.75 1.0"/>
@@ -558,7 +558,7 @@
 		    <visual>
 		      <origin rpy="0 0 0" xyz="0 0 0"/>
 		      <geometry>
-			<mesh filename="package://fh_desc/meshes/v2/finger_dist_link_simple.dae" scale="0.5 0.5 0.5"/>
+			<mesh filename="package://igor/meshes/finger_dist_link_simple.dae" scale="0.5 0.5 0.5"/>
 		      </geometry>
 		      <material name="light_grey">
 			<color rgba="0.75 0.75 0.75 1.0"/>
@@ -567,7 +567,7 @@
 		    <collision>
 		      <origin rpy="0 0 0" xyz="0 0 0"/>
 		      <geometry>
-			<mesh filename="package://fh_desc/meshes/v2/finger_dist_link_simple.dae" scale="0.5 0.5 0.5"/>
+			<mesh filename="package://igor/meshes/finger_dist_link_simple.dae" scale="0.5 0.5 0.5"/>
 		      </geometry>
 		      <material name="light_grey">
 			<color rgba="0.75 0.75 0.75 1.0"/>
@@ -641,7 +641,7 @@
 		    <visual>
 		      <origin rpy="0 0 0" xyz="0 0 0"/>
 		      <geometry>
-			<mesh filename="package://fh_desc/meshes/omd-d18-tip.dae" scale="0.5 0.5 0.5"/>
+			<mesh filename="package://igor/meshes/omd-d18-tip.dae" scale="0.5 0.5 0.5"/>
 		      </geometry>
 		      <material name="light_grey">
 			<color rgba="0.75 0.75 0.75 1.0"/>
@@ -650,7 +650,7 @@
 		    <collision>
 		      <origin rpy="0 0 0" xyz="0 0 0"/>
 		      <geometry>
-			<mesh filename="package://fh_desc/meshes/omd-d18-tip.dae" scale="0.5 0.5 0.5"/>
+			<mesh filename="package://igor/meshes/omd-d18-tip.dae" scale="0.5 0.5 0.5"/>
 		      </geometry>
 		      <material name="light_grey">
 			<color rgba="0.75 0.75 0.75 1.0"/>

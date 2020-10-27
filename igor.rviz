@@ -284,6 +284,11 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
+        pepsi_can:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
         robot_center_link:
           Alpha: 1
           Show Axes: false
@@ -343,7 +348,7 @@ Visualization Manager:
         H1_F3_tip:
           Value: false
         H1_base_attach:
-          Value: true
+          Value: false
         H1_base_link:
           Value: false
         H1_insert_F1:
@@ -392,6 +397,8 @@ Visualization Manager:
           Value: false
         map:
           Value: false
+        pepsi_can:
+          Value: true
         robot_center_link:
           Value: false
       Marker Scale: 0.5
@@ -452,6 +459,8 @@ Visualization Manager:
                                         H1_F3_tip:
                                           H1_F3_optoforce:
                                             {}
+                              pepsi_can:
+                                {}
               body_imu_link:
                 {}
       Update Interval: 0
@@ -561,18 +570,18 @@ Visualization Manager:
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0.5763134360313416
-        Y: -0.0779651626944542
-        Z: 0.7954676151275635
+        X: 0.5089390277862549
+        Y: -0.11298588663339615
+        Z: 0.949019193649292
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.41979631781578064
+      Pitch: 0.029796384274959564
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 6.188446998596191
+      Yaw: 1.3952608108520508
     Saved:
       - Class: rviz/Orbit
         Distance: 2.6209158897399902
