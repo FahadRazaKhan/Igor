@@ -514,7 +514,7 @@ Visualization Manager:
       Marker Topic: /zram_marker
       Name: Marker
       Namespaces:
-        {}
+        sphere_shape: true
       Queue Size: 1
       Value: true
     - Class: rviz/Marker
@@ -522,7 +522,7 @@ Visualization Manager:
       Marker Topic: /support_marker
       Name: Marker
       Namespaces:
-        {}
+        line_shape: true
       Queue Size: 1
       Value: true
     - Alpha: 1
@@ -563,25 +563,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 1.560798168182373
+      Distance: 3.0807387828826904
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0.5089390277862549
-        Y: -0.11298588663339615
-        Z: 0.949019193649292
+        X: 0.7182769775390625
+        Y: -0.1928444653749466
+        Z: 0.9436672925949097
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.029796384274959564
+      Pitch: 0.579796314239502
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 1.3952608108520508
+      Yaw: 5.538446426391602
     Saved:
       - Class: rviz/Orbit
         Distance: 2.6209158897399902

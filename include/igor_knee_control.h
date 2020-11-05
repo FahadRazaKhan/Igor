@@ -42,7 +42,8 @@
 //#include "Iir.h" // iir filter library
 #include <gram_savitzky_golay/gram_savitzky_golay.h> //gram_savitzky_golay lib
 #include <boost/circular_buffer.hpp>
-#include <armadillo> // Linear algebra library
+#include "dwa_planner.h"
+//#include <armadillo> // Linear algebra library
 //#include "kalman/ekfilter.hpp" // Kalman filter library
 
 
@@ -66,6 +67,8 @@ private:
     geometry_msgs::TransformStamped leftLegTransformStamped;
     geometry_msgs::TransformStamped rightLegTransformStamped;
 
+    geometry_msgs::Vector3 zram_vec;
+    geometry_msgs::Vector3 f_vec;
 
     tf2_ros::Buffer tfBuffer;
     tf2_ros::TransformListener tf2Listener{tfBuffer};
@@ -92,6 +95,9 @@ private:
     float fore_arm_angle = 0;
     float upper_arm_vel = 0; 
     float fore_arm_vel = 0;
+
+    float last_time = 0.0;
+    float current_ros_time = 0.0;
     
     
     
@@ -134,6 +140,9 @@ private:
     float CoM_acc_z;
     float ground_level = 0.0;
     float alpha = 0;
+
+    float pitch_vel_y = 0;
+    float yaw_vel_z = 0;
 
 
 
@@ -244,19 +253,19 @@ private:
 
 
     // CT gains for ff_fb_controller
-    float Kp1 = -7*1.3; // Linear postion gain
-    float Kp2 = -50*0.5; // Yaw gain
-    float Kp3 = -95*0.6;//-105; // Pitch gain
-    float Kv1 = -5*0.53; // Linear velocity gain
-    float Kv2 = -10*0.3; // Yaw speed gain
-    float Kv3 = -20*0.65; // Pitch speed gain
+    // float Kp1 = -7*1.3; // Linear postion gain
+    // float Kp2 = -50*0.5; // Yaw gain
+    // float Kp3 = -95*0.6;//-105; // Pitch gain
+    // float Kv1 = -5*0.53; // Linear velocity gain
+    // float Kv2 = -10*0.3; // Yaw speed gain
+    // float Kv3 = -20*0.65; // Pitch speed gain
 
-    // float Kp1 = -6.3; // Linear postion gain
-    // float Kp2 = -60; // Yaw gain
-    // float Kp3 = -95;//-105; // Pitch gain
-    // float Kv1 = -4; // Linear velocity gain
-    // float Kv2 = -10; // Yaw speed gain
-    // float Kv3 = -20; // Pitch speed gain
+    float Kp1 = -6.3; // Linear postion gain
+    float Kp2 = -60; // Yaw gain
+    float Kp3 = -95;//-105; // Pitch gain
+    float Kv1 = -4; // Linear velocity gain
+    float Kv2 = -10; // Yaw speed gain
+    float Kv3 = -20; // Pitch speed gain
     
     Eigen::Vector3d feedbck;
     Eigen::Vector2d output_trq;
@@ -276,15 +285,13 @@ public:
     igor_knee_control(ros::NodeHandle* nodehandle); // constructor
     ~igor_knee_control(); // destructor
 
-    float pitch_vel_y = 0;
-    float yaw_vel_z = 0;
-    //float freq = 0;
-    geometry_msgs::Vector3 state_vec;
-    geometry_msgs::Vector3 state_vec2;
-    geometry_msgs::Vector3 zram_vec;
-    geometry_msgs::Vector3 f_vec;
     
-  
+    //float freq = 0;
+    //geometry_msgs::Vector3 state_vec;
+    //geometry_msgs::Vector3 state_vec2;
+    
+    
+    //DWAPlanner mPlanner;
     
 
     // Window size is 2*m+1

@@ -146,8 +146,7 @@ include_directories(
 add_library(igor_states_lib
    src/igor_states.cpp
 ) ## My library
-
-
+add_library(dwa_planner_lib src/dwa_planner.cpp)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -197,7 +196,7 @@ target_link_libraries(igor_3d_controller_node
  )
 
 target_link_libraries(igor_knee_controller_node
-   ${catkin_LIBRARIES} gram_savitzky_golay #iir::iir
+   ${catkin_LIBRARIES} gram_savitzky_golay dwa_planner_lib #iir::iir
  )
 
 target_link_libraries(igor_odom_broadcaster_node

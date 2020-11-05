@@ -319,8 +319,8 @@ void igor_knee_control::CoG_callback(const geometry_msgs::PointStamped::ConstPtr
     plot_vector.data[6] = CoM_acc_y;
 
     //this->lqr_controller(igor_state);
-    //this->CT_controller(igor_state);
-    this->ff_fb_controller();
+    this->CT_controller(igor_state);
+    //this->ff_fb_controller();
 
 
 } // End of CoG_callback
@@ -472,8 +472,8 @@ void igor_knee_control::CT_controller(Eigen::VectorXf vec) // Computed Torque co
     CT_trq_l.data = output_trq(0); // Left wheel torque
     
     
-    // Lwheel_pub.publish(CT_trq_l);
-    // Rwheel_pub.publish(CT_trq_r);
+    Lwheel_pub.publish(CT_trq_l);
+    Rwheel_pub.publish(CT_trq_r);
     
 
     // plot_vector.data[7] = output_trq(1); // Right wheel torque
@@ -491,11 +491,11 @@ void igor_knee_control::ff_fb_controller(){
     plot_vector.data[8] = trq_l.data = output_trq(0) + lqr_left_trq;
     plot_vector.data[7] = trq_r.data = output_trq(1) + lqr_right_trq;
 
-    Lwheel_pub.publish(trq_l);
-    Rwheel_pub.publish(trq_r);
+    // Lwheel_pub.publish(trq_l);
+    // Rwheel_pub.publish(trq_r);
 
 
-    plot_publisher.publish(plot_vector);
+    // plot_publisher.publish(plot_vector);
 
 }// End of ff_fb_controller
 
@@ -507,7 +507,7 @@ void igor_knee_control::ref_update()
 
 
     if (sim_time.toSec()>=10 && sim_time.toSec()<=10.8){
-        ref_state(0) = 1; // forward position
+        ref_state(0) = 0; // forward position
         //ref_state(0) = 0.5*(sin(0.7*ros::Time::now().toSec())); // forward position
         //ref_state(1) = M_PI/4*(cos(0.3*ros::Time::now().toSec())); // yaw
 
@@ -516,9 +516,10 @@ void igor_knee_control::ref_update()
         accl_d(1) = 0; // Endeffector Y acceleration
 
     }
+
     else{
         
-        ref_state(0) = 1; // forward position
+        ref_state(0) = 0; // forward position
         ref_state(1) = 0.0; // yaw
         
         EE_pos_ref(0) = 0.3; // End-effector X reference
@@ -528,6 +529,7 @@ void igor_knee_control::ref_update()
 
         accl_d(0) = 0; // Endeffector X acceleration
         accl_d(1) = 0; // Endeffector Y acceleration
+
     }
     
     knee_ref.data = 0*2.0*abs(sin(0.3*ros::Time::now().toSec()));
@@ -541,7 +543,7 @@ void igor_knee_control::ref_update()
 
 igor_knee_control::~igor_knee_control()
 {
-
+    std::cout<<"igor_knee_control object destroyed" << std::endl;
 } // End of destructor
 
 
