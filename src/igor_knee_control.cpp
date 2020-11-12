@@ -14,6 +14,7 @@ igor_knee_control::igor_knee_control(ros::NodeHandle* nodehandle):nh_(*nodehandl
     sub_CoG = nh_.subscribe<geometry_msgs::PointStamped>("/cog/robot",1, &igor_knee_control::CoG_callback,this);
     clk_subscriber = nh_.subscribe<rosgraph_msgs::Clock>("/clock",10,&igor_knee_control::clk_callback,this);
     joint_states_subscriber = nh_.subscribe<sensor_msgs::JointState>("/igor/joint_states",1, &igor_knee_control::joint_states_callback,this);
+    sub_command_velocity = nh_.subscribe<geometry_msgs::Twist>("/igor/commands/velocity",1, &igor_knee_control::command_velocity_callback,this);
     
     zram_pub = nh_.advertise<geometry_msgs::Vector3>( "/igor/zramVec", 1 );
     f_pub = nh_.advertise<geometry_msgs::Vector3>( "/igor/fVec", 1 );
@@ -27,6 +28,7 @@ igor_knee_control::igor_knee_control(ros::NodeHandle* nodehandle):nh_(*nodehandl
     upper_arm_pub = nh_.advertise<std_msgs::Float64>( "/igor/Upper_arm_joint_effort_controller/command", 1 );
     fore_arm_pub = nh_.advertise<std_msgs::Float64>( "/igor/Fore_arm_joint_effort_controller/command", 1 );
     client = nh_.serviceClient<std_srvs::Empty>("/gazebo/reset_world"); // service client of gazebo service
+    igor_state_publisher = nh_.advertise<std_msgs::Float32MultiArray>( "/igor/igor_state", 5);
 
     // LQR gains
     // k_r(0,0)= k_l(0,0) = 4*(-0.7071); // Forward position gain -ve
@@ -92,13 +94,14 @@ igor_knee_control::igor_knee_control(ros::NodeHandle* nodehandle):nh_(*nodehandl
     // Reference states
     ref_state(0) = 0; // Center Position 
     ref_state(1) = 0; // Yaw
-    ref_state(2) = 0.0; // Beta
+    ref_state(2) = 0; // Pitch
     ref_state(3) = 0; // Center velocity
     ref_state(4) = 0; // yaw velocity
-    ref_state(5) = 0.0; // Pitch velocity
+    ref_state(5) = 0; // Pitch velocity
 
 
     plot_vector.data.resize(10); // Resizing std::msg array
+    pub_igor_state.data.resize(5);
 
     // Manipulator gains
     K_pos(0,0) = 18;
@@ -113,6 +116,11 @@ igor_knee_control::igor_knee_control(ros::NodeHandle* nodehandle):nh_(*nodehandl
     
         
 } // End of constructor
+
+void igor_knee_control::command_velocity_callback(const geometry_msgs::Twist::ConstPtr &msg){
+    dwa_linear_velocity = msg->linear.x;
+    dwa_angular_velocity = msg->angular.z;
+}
 
 void igor_knee_control::body_imu_callback(const sensor_msgs::Imu::ConstPtr &msg)
 {
@@ -149,7 +157,9 @@ void igor_knee_control::body_imu_callback(const sensor_msgs::Imu::ConstPtr &msg)
     plot_vector.data[0] = igor_linear_accl.x;
     plot_vector.data[1] = igor_linear_accl.y;
     plot_vector.data[2] = igor_linear_accl.z;
-    //ROS_INFO("Imu Pitch: %f",pitch);
+    
+    pub_igor_state.data[2] = igor_state(1);
+    pub_igor_state.data[4] = igor_state(4);
 
     
 }// End of imu_callback
@@ -208,6 +218,10 @@ void igor_knee_control::odom_callback(const nav_msgs::Odometry::ConstPtr &msg)
     //plot_vector.data[6] = igor_state(3);
     
     plot_vector.data[9] = igor_pos_y;
+
+    pub_igor_state.data[0] = igor_pos_x;
+    pub_igor_state.data[1] = igor_pos_y;
+    pub_igor_state.data[3] = igor_state(3);
 
 
 
@@ -366,9 +380,9 @@ void igor_knee_control::joint_states_callback(const sensor_msgs::JointState::Con
     EE_pos_err = EE_pos_ref-EE_pos;
     EE_vel_err = EE_vel_ref-EE_vel;
 
-    feedb = J.colPivHouseholderQr().solve(accl_d+K_pos*EE_pos_err + K_vel*EE_vel_err - (J_dot*arm_angular_vel));
+    armFeedb = J.colPivHouseholderQr().solve(accl_d+K_pos*EE_pos_err + K_vel*EE_vel_err - (J_dot*arm_angular_vel));
 
-    tau = M*feedb+N;
+    tau = M*armFeedb+N;
 
 
     upper_arm_trq.data = tau(0);
@@ -476,9 +490,10 @@ void igor_knee_control::CT_controller(Eigen::VectorXf vec) // Computed Torque co
     Rwheel_pub.publish(CT_trq_r);
     
 
-    // plot_vector.data[7] = output_trq(1); // Right wheel torque
-    // plot_vector.data[8] = output_trq(0); // Left wheel torque
-    // plot_publisher.publish(plot_vector);
+    plot_vector.data[7] = output_trq(1); // Right wheel torque
+    plot_vector.data[8] = output_trq(0); // Left wheel torque
+    plot_publisher.publish(plot_vector);
+    igor_state_publisher.publish(pub_igor_state);
 
 
 }// End of CT_controller
@@ -496,6 +511,7 @@ void igor_knee_control::ff_fb_controller(){
 
 
     // plot_publisher.publish(plot_vector);
+    // igor_state_publisher.publish(pub_igor_state);
 
 }// End of ff_fb_controller
 
@@ -507,19 +523,41 @@ void igor_knee_control::ref_update()
 
 
     if (sim_time.toSec()>=10 && sim_time.toSec()<=10.8){
-        ref_state(0) = 0; // forward position
+    //if (sim_time.toSec()>=10){
+        //ref_state(0) = 0; // forward position
         //ref_state(0) = 0.5*(sin(0.7*ros::Time::now().toSec())); // forward position
         //ref_state(1) = M_PI/4*(cos(0.3*ros::Time::now().toSec())); // yaw
 
+        // CT position gains
+        // Kp(0,0) = 0.0;
+        // Kp(1,1) = 0.0;
+        // Kv(0,0) = -1.5;
+        // Kv(1,1) = -30;
 
-        accl_d(0) = 0; // Endeffector X acceleration
+        //LQR position gains
+        // k_r(0,0)= k_l(0,0) = (0); // Forward position gain
+        // k_r(0,1)= k_l(0,1) = (0); // Yaw gain
+
+        // ref_state(3) = dwa_linear_velocity;
+        // ref_state(4) = dwa_angular_velocity;
+
+
+        // Manipulator reference positions and accelerations
+        // EE_pos_ref(0) = 0.3; // End-effector X reference
+        // EE_pos_ref(1) = 0.0; // End-effector Y reference
+        // EE_vel_ref(0) = 0; // End-effector X velocity reference
+        // EE_vel_ref(1) = 0; // End-effector Y velocity reference
+
+        accl_d(0) = 7; // Endeffector X acceleration
         accl_d(1) = 0; // Endeffector Y acceleration
+
+
 
     }
 
     else{
         
-        ref_state(0) = 0; // forward position
+        ref_state(0) = 0.0; // forward position
         ref_state(1) = 0.0; // yaw
         
         EE_pos_ref(0) = 0.3; // End-effector X reference

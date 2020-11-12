@@ -8,7 +8,6 @@ Panels:
         - /Status1
         - /RobotModel1
         - /TF1
-        - /TF1/Frames1
         - /PointStamped1
         - /Odometry1
         - /Marker1
@@ -396,7 +395,7 @@ Visualization Manager:
         chassis:
           Value: false
         map:
-          Value: false
+          Value: true
         pepsi_can:
           Value: true
         robot_center_link:
@@ -563,7 +562,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 3.0807387828826904
+      Distance: 4.3677263259887695
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -578,10 +577,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.579796314239502
+      Pitch: 0.44979655742645264
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 5.538446426391602
+      Yaw: 5.588455677032471
     Saved:
       - Class: rviz/Orbit
         Distance: 2.6209158897399902

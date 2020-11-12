@@ -42,7 +42,7 @@
 //#include "Iir.h" // iir filter library
 #include <gram_savitzky_golay/gram_savitzky_golay.h> //gram_savitzky_golay lib
 #include <boost/circular_buffer.hpp>
-#include "dwa_planner.h"
+//#include "dwa_planner.h"
 //#include <armadillo> // Linear algebra library
 //#include "kalman/ekfilter.hpp" // Kalman filter library
 
@@ -96,8 +96,8 @@ private:
     float upper_arm_vel = 0; 
     float fore_arm_vel = 0;
 
-    float last_time = 0.0;
-    float current_ros_time = 0.0;
+    //float last_time = 0.0;
+    //float current_ros_time = 0.0;
     
     
     
@@ -117,6 +117,7 @@ private:
     std_msgs::Float64 knee_ref;
     std_msgs::Float64 hip_ref;
     std_msgs::Float32MultiArray plot_vector;
+    std_msgs::Float32MultiArray pub_igor_state;
 
     float L = 0;
     const float l1 = 0.3; // arm lengths and center of gravity
@@ -125,8 +126,8 @@ private:
     const float lg2 = 0.3;
     const float I1 = 0.018; // Arm moment of inertia
     const float I2 = 0.0339;//0.018; // Arm moment of inertia
-    const float arm_m1 = 0.6; // Arm masses
-    const float arm_m2 = 0.6+0.53; // Arm masses
+    const float arm_m1 = 0.6; // Arm mass
+    const float arm_m2 = 0.6+0.53; // Arm mass
 
     float CoG_angle = 0; 
     float leanAngle = 0; 
@@ -144,6 +145,9 @@ private:
     float pitch_vel_y = 0;
     float yaw_vel_z = 0;
 
+    float dwa_linear_velocity = 0.0;
+    float dwa_angular_velocity = 0.0;
+
 
 
     
@@ -155,12 +159,6 @@ private:
     //float vel_filt_in = 0;
     //float last_vel_filt_out = 0.0;
     //float last_vel_filt_in = 0.0;
-
-   
-
-
-
-
     
     //geometry_msgs::Point ref_origin;
     
@@ -173,6 +171,7 @@ private:
     ros::Subscriber sub_CoG; // creating ROS subscriber
     ros::Subscriber clk_subscriber; // creating ROS subscriber
     ros::Subscriber joint_states_subscriber; // creating ROS subscriber
+    ros::Subscriber sub_command_velocity;
     
 
     
@@ -187,6 +186,7 @@ private:
     ros::Publisher  plot_publisher;
     ros::Publisher  upper_arm_pub;
     ros::Publisher  fore_arm_pub;
+    ros::Publisher  igor_state_publisher;
     
 
 
@@ -199,6 +199,7 @@ private:
     void ff_fb_controller();
     void ref_update();
     void clk_callback(const rosgraph_msgs::Clock::ConstPtr &msg);
+    void command_velocity_callback(const geometry_msgs::Twist::ConstPtr &msg);
 
     Eigen::Vector2f trig_vec; // declaring 2X1 Eigen vector of datatype float
     Eigen::MatrixXf pos_vec = Eigen::MatrixXf(1,2);
@@ -247,7 +248,7 @@ private:
     Eigen::Vector2f EE_pos{0,0}; // End-effector positions
     Eigen::Vector2f EE_pos_ref{0,0}; // End-effector reference positions
     Eigen::Vector2f EE_pos_err{0,0}; // End-effector positions error
-    Eigen::Vector2f feedb; // feedback
+    Eigen::Vector2f armFeedb; // arm feedback
     Eigen::Vector2f tau; // Manipulator torques
     Eigen::Vector2f accl_d{0,0}; // Desired manipulator accelerations
 
@@ -284,14 +285,6 @@ public:
 
     igor_knee_control(ros::NodeHandle* nodehandle); // constructor
     ~igor_knee_control(); // destructor
-
-    
-    //float freq = 0;
-    //geometry_msgs::Vector3 state_vec;
-    //geometry_msgs::Vector3 state_vec2;
-    
-    
-    //DWAPlanner mPlanner;
     
 
     // Window size is 2*m+1
