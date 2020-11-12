@@ -84,11 +84,11 @@ Eigen::VectorXf refState = Eigen::VectorXf(6);
 Eigen::MatrixXf k_r = Eigen::MatrixXf(1,6); // declaring 1X6 Eigen matrix of datatype float
 Eigen::MatrixXf k_l = Eigen::MatrixXf(1,6); // declaring 1X6 Eigen matrix of datatype float
 
-Eigen::Vector3d rightLegTranslation;
-Eigen::Vector3d leftLegTranslation;
-Eigen::Vector3d groundPoint;
-Eigen::Vector3d CoM_vec;
-Eigen::Vector3d CoM_line;
+Eigen::Vector3d rightLegTranslation{0,0,0};
+Eigen::Vector3d leftLegTranslation{0,0,0};
+Eigen::Vector3d groundPoint{0,0,0};
+Eigen::Vector3d CoM_vec{0,0,0};
+Eigen::Vector3d CoM_line{0,0,0};
 Eigen::Matrix3d pitchRotEigen;
 
 Eigen::MatrixXd M_h = Eigen::MatrixXd(3,3);
@@ -98,7 +98,7 @@ Eigen::Vector3d G_h;
 Eigen::MatrixXd E_h_inv = Eigen::MatrixXd(2,3);
 Eigen::Vector3d Ep;
 Eigen::Vector3d Ev;
-Eigen::Vector3d velocities;
+Eigen::Vector3d velocities{0,0,0};
 Eigen::MatrixXd Kp = Eigen::MatrixXd(3,3);
 Eigen::MatrixXd Kv = Eigen::MatrixXd(3,3);
 // CT gains for ff_fb_controller
@@ -117,8 +117,8 @@ float Kv3 = -20*0.65; // Pitch speed gain
 // float Kv2 = -10; // Yaw speed gain
 // float Kv3 = -20; // Pitch speed gain
 
-Eigen::Vector3d feedbck;
-Eigen::Vector2d output_trq;
+Eigen::Vector3d feedbck{0,0,0};
+Eigen::Vector2d output_trq{0,0};
 float L = 0.513; // CoM height
 float lqr_trq_r = 0, lqr_trq_l = 0, CT_trq_r = 0, CT_trq_l = 0, trq_r = 0, trq_l  = 0;
 
