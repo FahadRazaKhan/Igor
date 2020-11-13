@@ -104,10 +104,10 @@ igor_knee_control::igor_knee_control(ros::NodeHandle* nodehandle):nh_(*nodehandl
     pub_igor_state.data.resize(5);
 
     // Manipulator gains
-    K_pos(0,0) = 18;
+    K_pos(0,0) = 15;
     K_pos(0,1) = 0;
     K_pos(1,0) = 0;
-    K_pos(1,1) = 18;
+    K_pos(1,1) = 15;
 
     K_vel(0,0) = 3;
     K_vel(0,1) = 0;
@@ -153,10 +153,16 @@ void igor_knee_control::body_imu_callback(const sensor_msgs::Imu::ConstPtr &msg)
     yawVelVector.push_back(yaw_vel_z);
     igor_state(4) = yaw_vel_filt.filter(yawVelVector, 0);
 
+    linearAccelVectorX.push_back(igor_linear_accl.x);
+    linearAccelVectorY.push_back(igor_linear_accl.y);
+    
+
     //plot_vector.data[2] = igor_state(1);
-    plot_vector.data[0] = igor_linear_accl.x;
-    plot_vector.data[1] = igor_linear_accl.y;
+    plot_vector.data[0] = linearAccelFiltX.filter(linearAccelVectorX,0);
+    plot_vector.data[1] = linearAccelFiltY.filter(linearAccelVectorY,0);
     plot_vector.data[2] = igor_linear_accl.z;
+
+    
     
     pub_igor_state.data[2] = igor_state(1);
     pub_igor_state.data[4] = igor_state(4);
@@ -284,9 +290,9 @@ void igor_knee_control::CoG_callback(const geometry_msgs::PointStamped::ConstPtr
     my_data4.push_back(CoG_Position.y);
     my_data5.push_back(CoG_Position.z);
 
-    CoM_acc_x = (f3.filter(my_data3,0))/0.002;
-    CoM_acc_y = (f4.filter(my_data4,0))/0.002;
-    CoM_acc_z = (f5.filter(my_data5,0))/0.002;
+    CoM_acc_x = (f3.filter(my_data3,0));
+    CoM_acc_y = (f4.filter(my_data4,0));
+    CoM_acc_z = (f5.filter(my_data5,0));
 
     CoM_accl << (CoM_acc_x), (CoM_acc_y), (CoM_acc_z);
 
@@ -297,7 +303,13 @@ void igor_knee_control::CoG_callback(const geometry_msgs::PointStamped::ConstPtr
 
     alpha = (ground_level - CoG_Position.z) / f.z();
 
-    zram = CoM_pos + alpha*f;
+    std::cout << "CoG Position X: " << CoG_Position.x << std::endl;
+    std::cout << "f vector: " << f << std::endl;
+    std::cout << "ground level: " << ground_level << std::endl;
+    std::cout << "CoG Position Z: " << CoG_Position.z << std::endl;
+    std::cout << "alpha: " << alpha << std::endl;
+
+    zram = CoM_pos + (alpha*f);
 
     zram_vec.x = zram.x();
     zram_vec.y = zram.y();
@@ -328,13 +340,13 @@ void igor_knee_control::CoG_callback(const geometry_msgs::PointStamped::ConstPtr
     igor_state(2) = CoG_angle_filtered;   
     //igor_state(5) = CoG_angle_vel;
  
-    plot_vector.data[4] = igor_state(2);
+    plot_vector.data[4] = CoG_Position.x;
     plot_vector.data[5] = CoM_acc_x;
     plot_vector.data[6] = CoM_acc_y;
 
     //this->lqr_controller(igor_state);
-    this->CT_controller(igor_state);
-    //this->ff_fb_controller();
+    //this->CT_controller(igor_state);
+    this->ff_fb_controller();
 
 
 } // End of CoG_callback
@@ -486,14 +498,14 @@ void igor_knee_control::CT_controller(Eigen::VectorXf vec) // Computed Torque co
     CT_trq_l.data = output_trq(0); // Left wheel torque
     
     
-    Lwheel_pub.publish(CT_trq_l);
-    Rwheel_pub.publish(CT_trq_r);
+    // Lwheel_pub.publish(CT_trq_l);
+    // Rwheel_pub.publish(CT_trq_r);
     
 
-    plot_vector.data[7] = output_trq(1); // Right wheel torque
-    plot_vector.data[8] = output_trq(0); // Left wheel torque
-    plot_publisher.publish(plot_vector);
-    igor_state_publisher.publish(pub_igor_state);
+    // plot_vector.data[7] = output_trq(1); // Right wheel torque
+    // plot_vector.data[8] = output_trq(0); // Left wheel torque
+    // plot_publisher.publish(plot_vector);
+    // igor_state_publisher.publish(pub_igor_state);
 
 
 }// End of CT_controller
@@ -506,11 +518,11 @@ void igor_knee_control::ff_fb_controller(){
     plot_vector.data[8] = trq_l.data = output_trq(0) + lqr_left_trq;
     plot_vector.data[7] = trq_r.data = output_trq(1) + lqr_right_trq;
 
-    // Lwheel_pub.publish(trq_l);
-    // Rwheel_pub.publish(trq_r);
+    Lwheel_pub.publish(trq_l);
+    Rwheel_pub.publish(trq_r);
 
 
-    // plot_publisher.publish(plot_vector);
+    plot_publisher.publish(plot_vector);
     // igor_state_publisher.publish(pub_igor_state);
 
 }// End of ff_fb_controller
@@ -522,7 +534,7 @@ void igor_knee_control::ref_update()
     ROS_INFO("In ref_update");
 
 
-    if (sim_time.toSec()>=10 && sim_time.toSec()<=10.8){
+    if (sim_time.toSec()>=10.1 && sim_time.toSec()<=10.8){
     //if (sim_time.toSec()>=10){
         //ref_state(0) = 0; // forward position
         //ref_state(0) = 0.5*(sin(0.7*ros::Time::now().toSec())); // forward position
@@ -548,7 +560,8 @@ void igor_knee_control::ref_update()
         // EE_vel_ref(0) = 0; // End-effector X velocity reference
         // EE_vel_ref(1) = 0; // End-effector Y velocity reference
 
-        accl_d(0) = 7; // Endeffector X acceleration
+
+        accl_d(0) = -10*0; // Endeffector X acceleration
         accl_d(1) = 0; // Endeffector Y acceleration
 
 
@@ -560,6 +573,8 @@ void igor_knee_control::ref_update()
         ref_state(0) = 0.0; // forward position
         ref_state(1) = 0.0; // yaw
         
+
+
         EE_pos_ref(0) = 0.3; // End-effector X reference
         EE_pos_ref(1) = 0.0; // End-effector Y reference
         EE_vel_ref(0) = 0; // End-effector X velocity reference

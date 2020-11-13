@@ -249,24 +249,24 @@ private:
     Eigen::Vector2f EE_pos_ref{0,0}; // End-effector reference positions
     Eigen::Vector2f EE_pos_err{0,0}; // End-effector positions error
     Eigen::Vector2f armFeedb; // arm feedback
-    Eigen::Vector2f tau; // Manipulator torques
+    Eigen::Vector2f tau{0,0}; // Manipulator torques
     Eigen::Vector2f accl_d{0,0}; // Desired manipulator accelerations
 
 
     // CT gains for ff_fb_controller
-    // float Kp1 = -7*1.3; // Linear postion gain
-    // float Kp2 = -50*0.5; // Yaw gain
-    // float Kp3 = -95*0.6;//-105; // Pitch gain
-    // float Kv1 = -5*0.53; // Linear velocity gain
-    // float Kv2 = -10*0.3; // Yaw speed gain
-    // float Kv3 = -20*0.65; // Pitch speed gain
+    float Kp1 = -7*1.3; // Linear postion gain
+    float Kp2 = -50*0.5; // Yaw gain
+    float Kp3 = -95*0.6;//-105; // Pitch gain
+    float Kv1 = -5*0.53; // Linear velocity gain
+    float Kv2 = -10*0.3; // Yaw speed gain
+    float Kv3 = -20*0.65; // Pitch speed gain
 
-    float Kp1 = -6.3; // Linear postion gain
-    float Kp2 = -60; // Yaw gain
-    float Kp3 = -95;//-105; // Pitch gain
-    float Kv1 = -4; // Linear velocity gain
-    float Kv2 = -10; // Yaw speed gain
-    float Kv3 = -20; // Pitch speed gain
+    // float Kp1 = -6.3; // Linear postion gain
+    // float Kp2 = -60; // Yaw gain
+    // float Kp3 = -95;//-105; // Pitch gain
+    // float Kv1 = -4; // Linear velocity gain
+    // float Kv2 = -10; // Yaw speed gain
+    // float Kv3 = -20; // Pitch speed gain
     
     Eigen::Vector3d feedbck;
     Eigen::Vector2d output_trq;
@@ -290,7 +290,7 @@ public:
     // Window size is 2*m+1
     const int m1 = 12;
     const int m2 = 5;
-    const int m3 = 15;
+    const int m3 = 55;
     // Polynomial Order
     const int n1 = 0;
     const int n2 = 1;
@@ -304,8 +304,8 @@ public:
     const int d = 0;
     //double result;
     gram_sg::SavitzkyGolayFilterConfig sg_conf1{m1,t1,n1,d,0.002}; // filter configuration
-    gram_sg::SavitzkyGolayFilterConfig sg_conf2{m2,t2,n2,1,1}; // filter configuration
-    gram_sg::SavitzkyGolayFilterConfig sg_conf3{m3,t3,n3,2,1}; // filter configuration
+    gram_sg::SavitzkyGolayFilterConfig sg_conf2{m2,t2,n2,1,0.002}; // filter configuration
+    gram_sg::SavitzkyGolayFilterConfig sg_conf3{m3,t3,n3,2,0.002}; // filter configuration
     
     gram_sg::SavitzkyGolayFilter f1{sg_conf1};
     gram_sg::SavitzkyGolayFilter f3{sg_conf3};
@@ -313,11 +313,15 @@ public:
     gram_sg::SavitzkyGolayFilter f5{sg_conf3};
     gram_sg::SavitzkyGolayFilter pitch_vel_filt{sg_conf1};
     gram_sg::SavitzkyGolayFilter yaw_vel_filt{sg_conf1};
+    gram_sg::SavitzkyGolayFilter linearAccelFiltX{sg_conf1};
+    gram_sg::SavitzkyGolayFilter linearAccelFiltY{sg_conf1};
     
     boost::circular_buffer<double> rightTrqVector {boost::circular_buffer<double>((2*m1+1),0)}; // Initialize with 0
     boost::circular_buffer<double> leftTrqVector {boost::circular_buffer<double>((2*m1+1),0)}; // Initialize with 0
     boost::circular_buffer<double> pitchVelVector {boost::circular_buffer<double>((2*m1+1),0)};
     boost::circular_buffer<double> yawVelVector {boost::circular_buffer<double>((2*m1+1),0)};
+    boost::circular_buffer<double> linearAccelVectorX {boost::circular_buffer<double>((2*m1+1),0)};
+    boost::circular_buffer<double> linearAccelVectorY {boost::circular_buffer<double>((2*m1+1),0)};
     
     boost::circular_buffer<double> my_data1 {boost::circular_buffer<double>((2*m1+1),0)};
     boost::circular_buffer<double> my_data3 {boost::circular_buffer<double>((2*m3+1),-0.033)};
