@@ -1,0 +1,39 @@
+
+# make sure we use pkg-config
+QT_CONFIG -= no-pkg-config
+
+QMAKE_CXXFLAGS += -std=c++11 -Wno-deprecated-declarations
+
+CONFIG = link_pkgconfig
+
+PKGCONFIG += eigen3
+DEPENDPATH += .
+
+CONFIG += object_parallel_to_source
+CONFIG += rtti exceptions
+
+
+!include( config.pri ) {
+		  			
+}
+
+debug {
+	  CONFIG += warn_on
+}
+
+release {
+	DEFINES += NDEBUG
+}
+
+
+
+win32-g++ {
+   QMAKE_LFLAGS_SHLIB += -shared
+   INCLUDEPATH += /usr/local/include
+   LIBS += -L /usr/local/lib 
+}
+
+
+macx-* {
+QMAKE_LFLAGS_SONAME  = -Wl,-install_name,@rpath/
+}

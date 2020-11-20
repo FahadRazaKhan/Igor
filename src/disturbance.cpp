@@ -7,12 +7,12 @@ disturbance::disturbance() //Constructor
 {
     sub_clk = nh_.subscribe<rosgraph_msgs::Clock>("/clock",10,&disturbance::clk_callback,this);
     client = nh_.serviceClient<gazebo_msgs::ApplyBodyWrench>("/gazebo/apply_body_wrench"); // service client of gazebo service
-    igor_wrench.force.x = 32; // Force in newtons
+    igor_wrench.force.x = -20; // Force in newtons
     igor_wrench.force.y = 0;
     igor_wrench.force.z = 0;
     igor_wrench.torque.x = 0; // Moment in Nm
     igor_wrench.torque.y = 0;
-    igor_wrench.torque.z = 0;
+    igor_wrench.torque.z = 18*0;
 
     srv.request.body_name = igor_body_name;
     srv.request.reference_frame = igor_reference_frame;
@@ -24,7 +24,6 @@ void disturbance::clk_callback(const rosgraph_msgs::Clock::ConstPtr &msg){
 
     my_time = msg->clock;
 
-    //ROS_INFO("Simulation Time %f", my_time.toSec());
     
     if (my_time.toSec()==10){ // To call the rosservice at the 10th sec
         if(!run){

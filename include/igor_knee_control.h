@@ -139,7 +139,7 @@ private:
     float CoM_acc_x;
     float CoM_acc_y;
     float CoM_acc_z;
-    float ground_level = 0.0;
+    float ground_level = 0.1016; // same as wheel radius
     float alpha = 0;
 
     float pitch_vel_y = 0;
@@ -187,6 +187,7 @@ private:
     ros::Publisher  upper_arm_pub;
     ros::Publisher  fore_arm_pub;
     ros::Publisher  igor_state_publisher;
+    ros::Publisher  CoM_MapFrame_publisher;
     
 
 
@@ -290,7 +291,7 @@ public:
     // Window size is 2*m+1
     const int m1 = 12;
     const int m2 = 5;
-    const int m3 = 55;
+    const int m3 = 50;
     // Polynomial Order
     const int n1 = 0;
     const int n2 = 1;

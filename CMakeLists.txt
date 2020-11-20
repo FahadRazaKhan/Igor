@@ -233,6 +233,11 @@ target_link_libraries(igorHW_controller_node
 #   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 # )
 
+## Install Python script
+catkin_install_python(PROGRAMS scripts/CoM_Listner.py #add more scripts here e.g. scripts/xyz.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
 ## Mark executables and/or libraries for installation
 # install(TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_node
 #   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}

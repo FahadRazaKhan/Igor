@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://ros.org/wiki/xacro" name="arm">
 
-	<xacro:macro name="arm" params="prefix reflect flip *joint_pose">
+	<xacro:macro name="arm" params="prefix reflect flip lower_limit upper_limit *joint_pose">
 		
 		<link name="${prefix}_arm">
 			<visual>
@@ -32,7 +32,7 @@
 			<xacro:insert_block name="joint_pose"/>
 			<parent link="${prefix}_armActuator"/>
 			<child  link="${prefix}_arm"/>
-			<limit effort="25" lower="${-2}" upper="${2}" velocity="10"/>
+			<limit effort="15" lower="${lower_limit}" upper="${upper_limit}" velocity="15"/>
 			<axis xyz="0 0 1"/>
 			<dynamics damping="0.1"/>
 		</joint>

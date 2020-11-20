@@ -8,9 +8,12 @@ igor_markers::igor_markers() //Constructor
     base_frame = nh_.subscribe<nav_msgs::Odometry>("/igor/odom",1, & igor_markers::support_line, this);
     zram_sub = nh_.subscribe<geometry_msgs::Vector3>("/igor/zramVec",1, & igor_markers::zram_callback, this);
     f_sub = nh_.subscribe<geometry_msgs::Vector3>("/igor/fVec",1, & igor_markers::f_callback, this);
+    sub_CoG = nh_.subscribe<geometry_msgs::Point>("/igor/CoM_MapFrame",1, & igor_markers::CoG_callback,this);
+    
     ref_marker_pub = nh_.advertise<visualization_msgs::Marker>("ref_marker", 1);
     support_marker_pub = nh_.advertise<visualization_msgs::Marker>("support_marker", 1);
     zram_marker_pub = nh_.advertise<visualization_msgs::Marker>("zram_marker", 1);
+    zramArrow_marker_pub = nh_.advertise<visualization_msgs::Marker>("zramArrow_marker", 1);
     f_marker_pub = nh_.advertise<visualization_msgs::Marker>("f_marker", 1);
 
 
@@ -92,6 +95,14 @@ void igor_markers::support_line(const nav_msgs::Odometry::ConstPtr &msg){
 
 } // end of support_line
 
+
+void igor_markers::CoG_callback(const geometry_msgs::Point::ConstPtr &msg)
+{
+    CoM_position.x = msg->x;
+    CoM_position.y = msg->y;
+    CoM_position.z = msg->z;
+
+}
 void igor_markers::zram_callback(const geometry_msgs::Vector3::ConstPtr &msg)
 {
     zram_.x = msg->x;
@@ -107,7 +118,6 @@ void igor_markers::zram_callback(const geometry_msgs::Vector3::ConstPtr &msg)
     zram_marker.pose.position.x = zram_.x;
     zram_marker.pose.position.y = zram_.y;
     zram_marker.pose.position.z = zram_.z;
-    //ref_marker.points.push_back(igor_position);
     zram_marker.pose.orientation.x = 0;
     zram_marker.pose.orientation.y = 0;
     zram_marker.pose.orientation.z = 0;
@@ -120,8 +130,36 @@ void igor_markers::zram_callback(const geometry_msgs::Vector3::ConstPtr &msg)
     zram_marker.color.b = 0.855;
     zram_marker.color.a = 1.0;
     zram_marker.lifetime = ros::Duration();
-    //ros::Duration(0.01).sleep();
     zram_marker_pub.publish(zram_marker);
+
+    //*******************************//
+
+
+    zram_position.x = msg->x;
+    zram_position.y = msg->y;
+    zram_position.z = msg->z;
+
+    
+
+    zramArrow_marker.header.frame_id = "/map";
+    zramArrow_marker.header.stamp = ros::Time::now();
+    zramArrow_marker.ns = "Arrow_shape";
+    zramArrow_marker.id = 6;
+    zramArrow_marker.type = visualization_msgs::Marker::ARROW;
+    zramArrow_marker.action = visualization_msgs::Marker::ADD;
+    zramArrow_marker.pose.orientation.w = 1;
+    zramArrow_marker.points.clear();
+    zramArrow_marker.points.push_back(zram_position); // Tail
+    zramArrow_marker.points.push_back(CoM_position); // Head
+    zramArrow_marker.scale.x = 0.03;
+    zramArrow_marker.scale.y = 0.08;
+    zramArrow_marker.scale.z = 0.08;
+    zramArrow_marker.color.r = 1;
+    zramArrow_marker.color.g = 0;
+    zramArrow_marker.color.b = 0.855;
+    zramArrow_marker.color.a = 1.0;
+    zramArrow_marker.lifetime = ros::Duration();
+    zramArrow_marker_pub.publish(zramArrow_marker);
 
 } // end of zram_callback
 
@@ -134,13 +172,12 @@ void igor_markers::f_callback(const geometry_msgs::Vector3::ConstPtr &msg){
     f_marker.header.frame_id = "/map";
     f_marker.header.stamp = ros::Time::now();
     f_marker.ns = "sphere_shape";
-    f_marker.id = 2;
+    f_marker.id = 3;
     f_marker.type = visualization_msgs::Marker::SPHERE;
     f_marker.action = visualization_msgs::Marker::ADD;
     f_marker.pose.position.x = f_.x;
     f_marker.pose.position.y = f_.y;
     f_marker.pose.position.z = f_.z;
-    //ref_marker.points.push_back(igor_position);
     f_marker.pose.orientation.x = 0;
     f_marker.pose.orientation.y = 0;
     f_marker.pose.orientation.z = 0;
@@ -153,7 +190,6 @@ void igor_markers::f_callback(const geometry_msgs::Vector3::ConstPtr &msg){
     f_marker.color.b = 0.855;
     f_marker.color.a = 1.0;
     f_marker.lifetime = ros::Duration();
-    //ros::Duration(0.01).sleep();
     f_marker_pub.publish(f_marker);
 
 } // end of f_callback

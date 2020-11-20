@@ -13,6 +13,7 @@ Panels:
         - /Marker1
         - /Marker2
         - /PointStamped2
+        - /Marker3
       Splitter Ratio: 0.5137156844139099
     Tree Height: 719
   - Class: rviz/Selection
@@ -399,7 +400,7 @@ Visualization Manager:
         pepsi_can:
           Value: true
         robot_center_link:
-          Value: false
+          Value: true
       Marker Scale: 0.5
       Name: TF
       Show Arrows: false
@@ -527,12 +528,20 @@ Visualization Manager:
     - Alpha: 1
       Class: rviz/PointStamped
       Color: 237; 212; 0
-      Enabled: true
+      Enabled: false
       History Length: 1
       Name: PointStamped
       Radius: 0.10000000149011612
       Topic: /cog/arm
       Unreliable: false
+      Value: false
+    - Class: rviz/Marker
+      Enabled: true
+      Marker Topic: /zramArrow_marker
+      Name: Marker
+      Namespaces:
+        Arrow_shape: true
+      Queue Size: 100
       Value: true
   Enabled: true
   Global Options:
@@ -562,25 +571,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 4.3677263259887695
+      Distance: 2.304988384246826
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0.7182769775390625
-        Y: -0.1928444653749466
-        Z: 0.9436672925949097
+        X: 0.2666792869567871
+        Y: -0.7411099672317505
+        Z: 0.888573169708252
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.44979655742645264
+      Pitch: 0.8047959208488464
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 5.588455677032471
+      Yaw: 5.513448238372803
     Saved:
       - Class: rviz/Orbit
         Distance: 2.6209158897399902

@@ -4,9 +4,11 @@
 #include "nav_msgs/Odometry.h"
 #include "geometry_msgs/PoseWithCovariance.h"
 #include "geometry_msgs/Point.h"
+#include "geometry_msgs/PointStamped.h"
 #include <visualization_msgs/Marker.h>
 #include <tf2_ros/buffer.h>
 #include <tf2_ros/transform_listener.h>
+#include <tf/transform_listener.h>
 #include <geometry_msgs/TransformStamped.h>
 
 
@@ -20,9 +22,12 @@ class igor_markers
         ros::Subscriber base_frame;
         ros::Subscriber zram_sub;
         ros::Subscriber f_sub;
+        ros::Subscriber sub_CoG; // creating ROS subscriber
+        
         ros::Publisher  ref_marker_pub;
         ros::Publisher  support_marker_pub;
         ros::Publisher  zram_marker_pub;
+        ros::Publisher  zramArrow_marker_pub;
         ros::Publisher  f_marker_pub;
         
 
@@ -30,6 +35,7 @@ class igor_markers
         void support_line(const nav_msgs::Odometry::ConstPtr &msg);
         void zram_callback(const geometry_msgs::Vector3::ConstPtr &msg);
         void f_callback(const geometry_msgs::Vector3::ConstPtr &msg);
+        void CoG_callback(const geometry_msgs::Point::ConstPtr &msg);
 
         geometry_msgs::PoseWithCovariance igor_pose;
         geometry_msgs::Point igor_position;
@@ -40,12 +46,22 @@ class igor_markers
         visualization_msgs::Marker support_line_marker;
         visualization_msgs::Marker zram_marker;
         visualization_msgs::Marker f_marker;
+        visualization_msgs::Marker zramArrow_marker;
 
         tf2_ros::Buffer tfBufferL, tfBufferR;
         tf2_ros::TransformListener tf2ListenerL{tfBufferL}, tf2ListenerR{tfBufferR};
         geometry_msgs::TransformStamped transformStampedL, transformStampedR;
+        
+        // tf2_ros::Buffer tfBuffer;
+        // tf2_ros::TransformListener tf2Listener{tfBuffer};
+        // geometry_msgs::TransformStamped transformStamped;
+        
+        
         geometry_msgs::Point Lwheel_position;
         geometry_msgs::Point Rwheel_position;
+        geometry_msgs::Point zram_position;
+        geometry_msgs::Point CoM_position;
+        // geometry_msgs::Point CoM_position_Transformed;
 
 
 

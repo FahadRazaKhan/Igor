@@ -22,7 +22,7 @@
 
 	    		<inertial>
 				<origin rpy="${0} ${0} ${0}" xyz="${0} ${0} ${0}"/>
-	      			<mass value="0.241"/>
+	      			<mass value="${0.241*1.5}"/>
 	      			<inertia ixx="${0.00038433}" ixy="0.00" ixz="0.00" izz="${0.000170013}" iyz="0.000" iyy="0.00038433"/>
 	    		</inertial>
    
