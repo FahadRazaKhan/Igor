@@ -65,7 +65,7 @@
 	<!--node name="igor_test_main" pkg="igor" type="igor_test_main_node" output="screen" /-->
 	<node name="igor_markers_node" pkg="igor" type="igor_markers_node" /> <!-- For Igor_knee_controller only-->
 
-  	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find igor)/igor.rviz" />
+  	<!--node name="rviz" pkg="rviz" type="rviz" args="-d $(find igor)/igor.rviz" /-->
 	
 
 		<!-- load the controllers -->

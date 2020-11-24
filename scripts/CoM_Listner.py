@@ -28,10 +28,10 @@ def callback(data):
         
     
     CoG_transformed = tf2_geometry_msgs.do_transform_point(data, trans) # Transform Point from base_link frame to map frame
-    #print("Transformed CoG: ", CoG_transformed)
+   
 
     c = np.array([CoG_transformed.point.x, CoG_transformed.point.y, CoG_transformed.point.z])
-    dcom, ac = com_sg.send( (time.time(), c) )
+    dcom, ac = com_sg.send( (time.time(), c) ) # Applying SG filter to get velocity and acceleration
 
     # contact forces (f / total_mass)
     f = ac - gravity
@@ -41,8 +41,6 @@ def callback(data):
 
     zram = c + alpha * f
 
-    #print("ZRAM: ", zram)
-    print("CoG[2]: ", c[2])
 
     array = Float32MultiArray(data=zram)
     
@@ -71,8 +69,6 @@ if __name__ == '__main__':
 
     pub = rospy.Publisher('ZRAM_chatter', Float32MultiArray, queue_size=10)
 
-    # array=Float32MultiArray()
-    # array.data.reshape(3)
 
     tfBuffer = tf2_ros.Buffer()
     listener = tf2_ros.TransformListener(tfBuffer)
@@ -84,7 +80,5 @@ if __name__ == '__main__':
     ground_level = 0.1016
 
     com_sg = tool.savitsky_golay(sg, degree, eval_at = 0, only_new = False)
-
-    #pos_deriv = tool.savitsky_golay(sg, degree)
 
     CoM_Listener()

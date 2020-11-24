@@ -39,6 +39,7 @@
 #include <geometry_msgs/TransformStamped.h>
 #include <visualization_msgs/Marker.h>
 #include "rosgraph_msgs/Clock.h"
+#include <moveit/move_group_interface/move_group_interface.h>
 //#include "Iir.h" // iir filter library
 #include <gram_savitzky_golay/gram_savitzky_golay.h> //gram_savitzky_golay lib
 #include <boost/circular_buffer.hpp>
@@ -77,6 +78,10 @@ private:
     tf2_ros::TransformListener leftLegTfListener{leftLegTfBuffer};
     tf2_ros::Buffer rightLegTfBuffer;
     tf2_ros::TransformListener rightLegTfListener{rightLegTfBuffer};
+
+
+    // geometry_msgs::Pose move_target;
+    // moveit::planning_interface::MoveGroupInterface move_group{"Manipulator"};
     
     
     

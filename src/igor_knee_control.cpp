@@ -114,6 +114,19 @@ igor_knee_control::igor_knee_control(ros::NodeHandle* nodehandle):nh_(*nodehandl
     K_vel(0,1) = 0;
     K_vel(1,0) = 0;
     K_vel(1,1) = 3;
+
+
+    // move_target.position.x = 0.3;
+    // move_target.position.y = 0;
+    // move_target.position.z = 0;
+
+    // move_target.orientation.x = 0;
+    // move_target.orientation.y = 0;
+    // move_target.orientation.z = 0;
+    // move_target.orientation.w = 1;
+
+    // move_group.setPoseReferenceFrame("base_link");
+    // move_group.setPoseTarget(move_target); 
     
         
 } // End of constructor
@@ -536,8 +549,8 @@ void igor_knee_control::ref_update()
     ROS_INFO("In ref_update");
 
 
-    //if (sim_time.toSec()>=10.1 && sim_time.toSec()<=10.8){
-    if (abs(plot_vector.data[0])>=2.0){
+    if (sim_time.toSec()>=10.1 && sim_time.toSec()<=20.8){
+    //if (abs(plot_vector.data[0])>=2.0){
         //ref_state(0) = 0; // forward position
         //ref_state(0) = 0.5*(sin(0.7*ros::Time::now().toSec())); // forward position
         //ref_state(1) = M_PI/4*(cos(0.3*ros::Time::now().toSec())); // yaw
@@ -557,9 +570,17 @@ void igor_knee_control::ref_update()
 
 
 
-        accl_d(0) = -2*plot_vector.data[0]; // Endeffector X acceleration
-        accl_d(1) = 0; // Endeffector Y acceleration
+        // accl_d(0) = -2*plot_vector.data[0]; // Endeffector X acceleration
+        // accl_d(1) = 0; // Endeffector Y acceleration
 
+
+        EE_pos_ref(0) = -0.3*cos(M_PI/2);  // End-effector X reference
+        EE_pos_ref(1) = -0.3*sin(M_PI/2);  // End-effector Y reference
+        EE_vel_ref(0) = 0; // End-effector X velocity reference
+        EE_vel_ref(1) = 0; // End-effector Y 
+
+        // accl_d(0) = -10*cos(M_PI/2); // Endeffector X acceleration
+        // accl_d(1) = -10*sin(M_PI/2); 
 
 
     }
@@ -567,6 +588,14 @@ void igor_knee_control::ref_update()
     else if(igor_state(4)>=1.0){
         // upper_arm_trq.data = -20;
         // upper_arm_pub.publish(upper_arm_trq);
+
+        EE_pos_ref(0) = -0.3*(cos(0.7*ros::Time::now().toSec()));  // End-effector X reference
+        EE_pos_ref(1) = -0.3*(sin(0.7*ros::Time::now().toSec()));  // End-effector Y reference
+        EE_vel_ref(0) = 0; // End-effector X velocity reference
+        EE_vel_ref(1) = 0; // End-effector Y velocity reference
+
+        // accl_d(0) = 0; // Endeffector X acceleration
+        // accl_d(1) = 0; // Endeffector Y acceleration
     }
 
     else{
@@ -602,7 +631,8 @@ igor_knee_control::~igor_knee_control()
 } // End of destructor
 
 
-int main(int argc, char **argv){
+int main(int argc, char **argv){ /** The arguments to main are the means by which a system outside scope 
+and understanding of your program can configure your program to do a particular task. These are command line parameters.**/
 
 
 ros::init(argc, argv, "igor_controller"); // node name, can be superseded by node name in the launch file
@@ -611,8 +641,12 @@ igor_knee_control myNode(&nh); // creating the igor_knee_control object
 
 ros::Duration(0.1).sleep();
 //ros::spin(); // only need for subscriber to call its callback function (Does not need for Publisher).
-ros::MultiThreadedSpinner spinner(5); // Use 5 threads for 5 callbacks in parallel
-spinner.spin(); // spin() will not return until the node has been shutdown
+// ros::MultiThreadedSpinner spinner(5); // Use 5 threads for 5 callbacks in parallel
+// spinner.spin(); // spin() will not return until the node has been shutdown
+
+ros::AsyncSpinner async_spinner(5);
+async_spinner.start();
+ros::waitForShutdown();
 
 return 0;
 
