@@ -152,7 +152,7 @@ const int n2 = 0;
 const int t2 = m2;
 const int d = 0;
 
-gram_sg::SavitzkyGolayFilterConfig sg_conf{m1,t1,n1,1,1};
+gram_sg::SavitzkyGolayFilterConfig sg_conf{m1,t1,n1,1,0.002};
 gram_sg::SavitzkyGolayFilterConfig sg_conf2{m2,t2,n2,d,0.002};
 gram_sg::SavitzkyGolayFilter f1{sg_conf}, f2{sg_conf2}, f3{sg_conf2} , f4{sg_conf2};
 boost::circular_buffer<double> pitchVector {boost::circular_buffer<double>((2*m1+1),0)}; // Initialize with 0

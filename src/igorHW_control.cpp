@@ -36,7 +36,7 @@ void CoG_callback(const geometry_msgs::PointStamped::ConstPtr &msg)
     CoG_pitch = (f4.filter(CoGVector,0));
 
     pitchVector.push_back(CoG_pitch);
-    CoG_pitch_vel = (f1.filter(pitchVector,0))/0.002; // Divide by sampling time
+    CoG_pitch_vel = f1.filter(pitchVector,0); // Divide by sampling time
 
     if(CoG_pitch_vel > 10){
         CoG_pitch_vel = 10;
@@ -100,10 +100,10 @@ void odom_callback(const nav_msgs::Odometry::ConstPtr &msg)
     plot_vector.data[4] = igorState(2); // Pitch
     plot_vector.data[6] = igorState(3); // Forward Velocity
     plot_vector.data[9] = baseY;
-    ROS_INFO("Pitch angle %f",igorState(2));
+    //ROS_INFO("Pitch angle %f",igorState(2));
 
     //CT_controller(igorState); // Calling CT controller
-    //LQR_controller(igorState); // Calling LQR controller
+    // LQR_controller(igorState); // Calling LQR controller
     ff_fb_controller();
 
 } // End of odom_callback
@@ -117,7 +117,7 @@ void ref_update(){
     if (wall_duration.sec>=10){
         //plot_vector.data[1] = refState(0) = 0.5*(sin(0.7*ros::Time::now().toSec())); // Center Position
         plot_vector.data[1] = refState(0) = 0.5*0; // Center Position  
-        plot_vector.data[3] = refState(1) = M_PI/4*(cos(0.3*ros::Time::now().toSec())); // Yaw
+        plot_vector.data[3] = refState(1) = 0*M_PI/4*(cos(0.3*ros::Time::now().toSec())); // Yaw
         plot_vector.data[5] = refState(2) = -0.004*0; // Pitch
         refState(3) = 0.0; // Center velocity
         refState(4) = 0.0; // Yaw velocity
@@ -142,8 +142,8 @@ void CT_controller(Eigen::VectorXf vec) // Computed Torque controller
     ref_update();
 
     ROS_INFO("In CT controller");
-    ROS_INFO("Yaw Reference: %f", refState(1));
-    ROS_INFO("Yaw error %f", (refState(1)-vec(1)));
+    // ROS_INFO("Yaw Reference: %f", refState(1));
+    // ROS_INFO("Yaw error %f", (refState(1)-vec(1)));
     
     L = CoM_height;
 
@@ -337,13 +337,12 @@ int main(int argc, char **argv)
     wheelGroupCommand = new hebi::GroupCommand(wheel_group->size());
 
     // Actuator's gain upload
-    
-    // (*kneeGroupCommand).readGains("/home/fahadraza/catkin_ws/src/igor/config/HWkneeGains.xml");
+    (*kneeGroupCommand).readGains("/home/fahadraza/catkin_ws/src/igor/config/HWkneeGains.xml");
     (*kneeGroupCommand).readSafetyParameters("/home/fahadraza/catkin_ws/src/igor/config/HWkneeSafetyParam.xml");
     bool kneeGainSuccess = knee_group->sendCommandWithAcknowledgement(*kneeGroupCommand);
     std::cout<<"Knee Gains Uploaded:  "<< kneeGainSuccess << std::endl;
 
-    // (*hipGroupCommand).readGains("/home/fahadraza/catkin_ws/src/igor/config/HWhipGains.xml");
+    (*hipGroupCommand).readGains("/home/fahadraza/catkin_ws/src/igor/config/HWhipGains.xml");
     (*hipGroupCommand).readSafetyParameters("/home/fahadraza/catkin_ws/src/igor/config/HWhipSafetyParam.xml");
     bool hipGainSuccess = hip_group->sendCommandWithAcknowledgement(*hipGroupCommand);
     std::cout<<"Hip Gains Uploaded:  "<< hipGainSuccess << std::endl;
