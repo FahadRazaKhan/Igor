@@ -11,6 +11,7 @@ igor_knee_control::igor_knee_control(ros::NodeHandle* nodehandle):nh_(*nodehandl
 {
     sub_body_imu = nh_.subscribe<sensor_msgs::Imu>("/igor/body_imu/data",1, &igor_knee_control::body_imu_callback,this);
     sub_odom = nh_.subscribe<nav_msgs::Odometry>("/igor/odom",1, &igor_knee_control::odom_callback,this,ros::TransportHints().tcpNoDelay());
+    sub_centerOdom = nh_.subscribe<nav_msgs::Odometry>("/igor/centerOdom",1, &igor_knee_control::centerOdom_callback,this,ros::TransportHints().tcpNoDelay());
     sub_CoG = nh_.subscribe<geometry_msgs::PointStamped>("/cog/robot",1, &igor_knee_control::CoG_callback,this);
     clk_subscriber = nh_.subscribe<rosgraph_msgs::Clock>("/clock",10,&igor_knee_control::clk_callback,this);
     joint_states_subscriber = nh_.subscribe<sensor_msgs::JointState>("/igor/joint_states",1, &igor_knee_control::joint_states_callback,this);
@@ -32,7 +33,7 @@ igor_knee_control::igor_knee_control(ros::NodeHandle* nodehandle):nh_(*nodehandl
     igor_state_publisher = nh_.advertise<std_msgs::Float32MultiArray>( "/igor/igor_state", 5);
 
     // LQR gains
-    k_r(0,0)= k_l(0,0) = 4*(-0.7071); // Forward position gain -ve
+    k_r(0,0)= k_l(0,0) = 0*4*(-0.7071); // Forward position gain -ve
     k_r(0,1)= 2*(0.7071); // Yaw gain +ve
     k_r(0,2)= k_l(0,2) = 1.2*(-16.2331); // Pitch gain -ve
     k_r(0,3)= k_l(0,3) = (-4.8849); // Forward speed gain -ve
@@ -171,10 +172,10 @@ void igor_knee_control::body_imu_callback(const sensor_msgs::Imu::ConstPtr &msg)
     linearAccelVectorY.push_back(igor_linear_accl.y);
     
 
-    //plot_vector.data[2] = igor_state(1);
+    plot_vector.data[2] = igor_state(1);
     plot_vector.data[0] = (linearAccelFiltX.filter(linearAccelVectorX,0))-0.5; // offsetting by 0.5
     plot_vector.data[1] = linearAccelFiltY.filter(linearAccelVectorY,0);
-    plot_vector.data[2] = igor_linear_accl.z;
+    //plot_vector.data[2] = igor_linear_accl.z;
 
     //std::cout << "IMU X Acceleration: " << plot_vector.data[0] << std::endl;
     
@@ -190,6 +191,18 @@ void igor_knee_control::clk_callback(const rosgraph_msgs::Clock::ConstPtr &msg){
 
 } // End of clk_callback
 
+void igor_knee_control::centerOdom_callback(const nav_msgs::Odometry::ConstPtr &msg){
+
+    igor_wheelbase_position = msg->pose.pose.position;
+
+
+    plot_vector.data[7] = floorf(igor_wheelbase_position.x*1000)/1000;
+    plot_vector.data[8] = floorf(igor_wheelbase_position.y*1000)/1000;
+
+
+    
+    //ROS_INFO("Wheelbase Position X: %f",  plot_vector.data[3]);
+} // End of CenterOdom_callback
 
 void igor_knee_control::odom_callback(const nav_msgs::Odometry::ConstPtr &msg)
 {
@@ -310,18 +323,12 @@ void igor_knee_control::CoG_callback(const geometry_msgs::PointStamped::ConstPtr
 
     CoM_accl << (CoM_acc_x), (CoM_acc_y), (CoM_acc_z);
 
-    //std::cout << "CoM_acceleration" << std::endl << CoM_accl << std::endl;
-    //std::cout << "Gravity Vector:" << std::endl << gravity_vec << std::endl;
+
     
     f = CoM_accl - gravity_vec; // Contact forces
 
     alpha = (ground_level - CoG_Position.z) / f.z();
 
-    // std::cout << "CoG Position X: " << CoG_Position.x << std::endl;
-    // std::cout << "f vector: " << f << std::endl;
-    // std::cout << "ground level: " << ground_level << std::endl;
-    // std::cout << "CoG Position Z: " << CoG_Position.z << std::endl;
-    // std::cout << "alpha: " << alpha << std::endl;
 
     zram = CoM_pos + (alpha*f);
 
@@ -354,9 +361,9 @@ void igor_knee_control::CoG_callback(const geometry_msgs::PointStamped::ConstPtr
     igor_state(2) = CoG_angle_filtered;   
     //igor_state(5) = CoG_angle_vel;
  
-    plot_vector.data[4] = CoG_Position.x;
-    plot_vector.data[5] = CoM_acc_x;
-    plot_vector.data[6] = CoM_acc_y;
+    plot_vector.data[4] = zram.x();
+    plot_vector.data[5] = zram.y();
+    plot_vector.data[6] = zram.z();
 
     this->lqr_controller(igor_state);
     //this->CT_controller(igor_state);
@@ -422,17 +429,13 @@ void igor_knee_control::joint_states_callback(const sensor_msgs::JointState::Con
 void igor_knee_control::lqr_controller (Eigen::VectorXf vec) //LQR State-feedback controller
 {
     ROS_INFO("In LQR");
+    ROS_INFO("Pitch angle: %f", igor_state(2));
     if (igor_state(2)>= -0.35 && igor_state(2) <= 0.35){
         
         igor_knee_control::ref_update();
 
-        // rightTrqVector.push_back((k_r*(vec-ref_state)).value());
-        // trq_r.data = trq_r_filt.filter(rightTrqVector,0);
-
         lqr_right_trq = lqr_trq_r.data =  (k_r*(ref_state-vec)).value(); // taking the scalar value of the eigen-matrx
       
-        // leftTrqVector.push_back((k_l*(vec-ref_state)).value());
-        // trq_l.data = trq_l_filt.filter(leftTrqVector,0); 
         lqr_left_trq = lqr_trq_l.data =  (k_l*(ref_state-vec)).value();
         
 
@@ -449,9 +452,9 @@ void igor_knee_control::lqr_controller (Eigen::VectorXf vec) //LQR State-feedbac
         Lwheel_pub.publish(lqr_trq_l);
         Rwheel_pub.publish(lqr_trq_r);
         
-        ROS_INFO("Reseting Model");
-        ros::Duration(0.5).sleep(); // sleep for half a second
-        client.call(srv); // Calling the service to reset robot model in gazebo
+        // ROS_INFO("Reseting Model");
+        // ros::Duration(0.5).sleep(); // sleep for half a second
+        // client.call(srv); // Calling the service to reset robot model in gazebo
     }
     
     // plot_vector.data[7] = lqr_right_trq;
@@ -530,8 +533,8 @@ void igor_knee_control::ff_fb_controller(){
     this->lqr_controller(igor_state);
     this->CT_controller(igor_state);
     
-    plot_vector.data[8] = trq_l.data = output_trq(0) + lqr_left_trq;
-    plot_vector.data[7] = trq_r.data = output_trq(1) + lqr_right_trq;
+    // plot_vector.data[8] = trq_l.data = output_trq(0) + lqr_left_trq;
+    // plot_vector.data[7] = trq_r.data = output_trq(1) + lqr_right_trq;
 
     // Lwheel_pub.publish(trq_l);
     // Rwheel_pub.publish(trq_r);
@@ -549,63 +552,45 @@ void igor_knee_control::ref_update()
     ROS_INFO("In ref_update");
 
 
-    if (sim_time.toSec()>=10.1 && sim_time.toSec()<=20.8){
-    //if (abs(plot_vector.data[0])>=2.0){
-        //ref_state(0) = 0; // forward position
-        //ref_state(0) = 0.5*(sin(0.7*ros::Time::now().toSec())); // forward position
-        //ref_state(1) = M_PI/4*(cos(0.3*ros::Time::now().toSec())); // yaw
-
-        // CT position gains
-        // Kp(0,0) = 0.0;
-        // Kp(1,1) = 0.0;
-        // Kv(0,0) = -1.5;
-        // Kv(1,1) = -30;
-
-        //LQR position gains
-        // k_r(0,0)= k_l(0,0) = (0); // Forward position gain
-        // k_r(0,1)= k_l(0,1) = (0); // Yaw gain
-
-        // ref_state(3) = dwa_linear_velocity;
-        // ref_state(4) = dwa_angular_velocity;
+    //if (sim_time.toSec()>=10.1 && sim_time.toSec()<=20.8){
+    if (abs(plot_vector.data[0])>=2.0){
 
 
 
-        // accl_d(0) = -2*plot_vector.data[0]; // Endeffector X acceleration
-        // accl_d(1) = 0; // Endeffector Y acceleration
+
+        accl_d(0) = -2*plot_vector.data[0]; // Endeffector X acceleration
+        accl_d(1) = 0; // Endeffector Y acceleration
+        
+        ref_state(3) = 0; // Forward speed
 
 
-        EE_pos_ref(0) = -0.3*cos(M_PI/2);  // End-effector X reference
-        EE_pos_ref(1) = -0.3*sin(M_PI/2);  // End-effector Y reference
-        EE_vel_ref(0) = 0; // End-effector X velocity reference
-        EE_vel_ref(1) = 0; // End-effector Y 
-
-        // accl_d(0) = -10*cos(M_PI/2); // Endeffector X acceleration
-        // accl_d(1) = -10*sin(M_PI/2); 
 
 
     }
 
-    else if(igor_state(4)>=1.0){
-        // upper_arm_trq.data = -20;
-        // upper_arm_pub.publish(upper_arm_trq);
+    else if(abs(igor_state(4))>=1.0 && abs(igor_state(4))<=3.5){
 
-        EE_pos_ref(0) = -0.3*(cos(0.7*ros::Time::now().toSec()));  // End-effector X reference
-        EE_pos_ref(1) = -0.3*(sin(0.7*ros::Time::now().toSec()));  // End-effector Y reference
-        EE_vel_ref(0) = 0; // End-effector X velocity reference
-        EE_vel_ref(1) = 0; // End-effector Y velocity reference
+        // EE_pos_ref(0) = 0.3*cos(M_PI/2);  // End-effector X reference
+        // EE_pos_ref(1) = 0.3*sin(M_PI/2);  // End-effector Y reference
+        // EE_vel_ref(0) = -0.3*sin(M_PI/2); // End-effector X velocity reference
+        // EE_vel_ref(1) = 0.3*cos(M_PI/2); // End-effector Y 
 
-        // accl_d(0) = 0; // Endeffector X acceleration
-        // accl_d(1) = 0; // Endeffector Y acceleration
+        accl_d(0) = 0*-2*igor_state(4)*cos(M_PI/2); // Endeffector X acceleration
+        accl_d(1) = 0*-2*igor_state(4)*sin(M_PI/2); // Endeffector Y acceleration
     }
 
     else{
         
-        ref_state(0) = 0*(sin(0.3*ros::Time::now().toSec())); // forward position
+        //ref_state(0) = 0*(sin(0.3*ros::Time::now().toSec())); // forward position
+        //ref_state(0) = igor_state(0)-0.5; // forward position
         ref_state(1) = 0.0; // yaw
-        
+        ref_state(3) = -0.2; // Forward speed
+        ROS_INFO("ref_state(0): %f", ref_state(0));
+        ROS_INFO("ref_state(3): %f", ref_state(3));
+        ROS_INFO("igor_state(3): %f", igor_state(3));
 
 
-        EE_pos_ref(0) = 0.3; // End-effector X reference
+        EE_pos_ref(0) = 0.5; // End-effector X reference
         EE_pos_ref(1) = 0.0; // End-effector Y reference
         EE_vel_ref(0) = 0; // End-effector X velocity reference
         EE_vel_ref(1) = 0; // End-effector Y velocity reference
@@ -616,11 +601,11 @@ void igor_knee_control::ref_update()
 
     }
     
-    knee_ref.data = 0*2.0*abs(sin(0.3*ros::Time::now().toSec()));
-    hip_ref.data = 0*-1.0*abs(sin(0.3*ros::Time::now().toSec()));
+    //knee_ref.data = 0*2.0*abs(sin(0.3*ros::Time::now().toSec()));
+    //hip_ref.data = 0*-1.0*abs(sin(0.3*ros::Time::now().toSec()));
 
     //plot_vector.data[1] = ref_state(0);
-    plot_vector.data[3] = ref_state(1);
+    //plot_vector.data[3] = ref_state(1);
     //plot_vector.data[5] = ref_state(2); 
     
 }// End of ref_update function
@@ -644,7 +629,7 @@ ros::Duration(0.1).sleep();
 // ros::MultiThreadedSpinner spinner(5); // Use 5 threads for 5 callbacks in parallel
 // spinner.spin(); // spin() will not return until the node has been shutdown
 
-ros::AsyncSpinner async_spinner(5);
+ros::AsyncSpinner async_spinner(6);
 async_spinner.start();
 ros::waitForShutdown();
 

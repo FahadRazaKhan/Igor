@@ -59,6 +59,7 @@ private:
     geometry_msgs::PoseWithCovariance igor_pose;
     geometry_msgs::TwistWithCovariance igor_twist;
     geometry_msgs::Point igor_position;
+    geometry_msgs::Point igor_wheelbase_position;
     geometry_msgs::Point CoG_Position;
     geometry_msgs::Vector3 igor_linear_vel;
     geometry_msgs::Vector3 igor_angul_vel; // Vector3 type variable
@@ -105,8 +106,6 @@ private:
     //float current_ros_time = 0.0;
     
     
-    
-    //ros::Duration dt{0}; //sampling time
 
     double roll = 0; 
     double pitch = 0; 
@@ -173,6 +172,7 @@ private:
     ros::NodeHandle nh_; // creating ROS NodeHandle
     ros::Subscriber sub_body_imu; // creating ROS subscriber
     ros::Subscriber sub_odom; // creating ROS subscriber
+    ros::Subscriber sub_centerOdom; // creating ROS subscriber
     ros::Subscriber sub_CoG; // creating ROS subscriber
     ros::Subscriber clk_subscriber; // creating ROS subscriber
     ros::Subscriber joint_states_subscriber; // creating ROS subscriber
@@ -199,6 +199,7 @@ private:
     void body_imu_callback(const sensor_msgs::Imu::ConstPtr &msg);
     void joint_states_callback(const sensor_msgs::JointState::ConstPtr &msg);
     void odom_callback(const nav_msgs::Odometry::ConstPtr &msg);
+    void centerOdom_callback(const nav_msgs::Odometry::ConstPtr &msg);
     void CoG_callback(const geometry_msgs::PointStamped::ConstPtr &msg);
     void lqr_controller(Eigen::VectorXf eig_vec);
     void CT_controller(Eigen::VectorXf eig_vec);
@@ -212,10 +213,8 @@ private:
     Eigen::MatrixXf vel_vec = Eigen::MatrixXf(1,2);
     Eigen::MatrixXf k_r = Eigen::MatrixXf(1,6); // declaring 1X6 Eigen matrix of datatype float
     Eigen::MatrixXf k_l = Eigen::MatrixXf(1,6); // declaring 1X6 Eigen matrix of datatype float
-    //Eigen::MatrixXf k_k = Eigen::MatrixXf(1,8); // declaring 1X6 Eigen matrix of datatype float
     Eigen::VectorXf igor_state = Eigen::VectorXf(6); // declaring 6x1 Eigen vector of datatype float;
     Eigen::VectorXf ref_state = Eigen::VectorXf(6);
-    //Eigen::Vector3d robot_center_pos;
     Eigen::Vector3d CoM_pos;
     Eigen::Vector3d CoM_accl;
     Eigen::Vector3d zram;
@@ -260,19 +259,19 @@ private:
 
 
     // CT gains for ff_fb_controller
-    float Kp1 = -7*1.3; // Linear postion gain
-    float Kp2 = -50*0.5; // Yaw gain
-    float Kp3 = -95*0.6;//-105; // Pitch gain
-    float Kv1 = -5*0.53; // Linear velocity gain
-    float Kv2 = -10*0.3; // Yaw speed gain
-    float Kv3 = -20*0.65; // Pitch speed gain
+    // float Kp1 = -7*1.3; // Linear postion gain
+    // float Kp2 = -50*0.5; // Yaw gain
+    // float Kp3 = -95*0.6;//-105; // Pitch gain
+    // float Kv1 = -5*0.53; // Linear velocity gain
+    // float Kv2 = -10*0.3; // Yaw speed gain
+    // float Kv3 = -20*0.65; // Pitch speed gain
 
-    // float Kp1 = -6.3; // Linear postion gain
-    // float Kp2 = -60; // Yaw gain
-    // float Kp3 = -95;//-105; // Pitch gain
-    // float Kv1 = -4; // Linear velocity gain
-    // float Kv2 = -10; // Yaw speed gain
-    // float Kv3 = -20; // Pitch speed gain
+    float Kp1 = -6.3; // Linear postion gain
+    float Kp2 = -60; // Yaw gain
+    float Kp3 = -95;// Pitch gain
+    float Kv1 = -4; // Linear velocity gain
+    float Kv2 = -10; // Yaw speed gain
+    float Kv3 = -20; // Pitch speed gain
     
     Eigen::Vector3d feedbck;
     Eigen::Vector2d output_trq;
