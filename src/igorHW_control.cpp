@@ -33,10 +33,10 @@ void CoG_callback(const geometry_msgs::PointStamped::ConstPtr &msg)
     leanAngle = atan2(CoM_line.x(), CoM_line.z());
 
     CoGVector.push_back(leanAngle);
-    CoG_pitch = (f4.filter(CoGVector,0));
+    CoG_pitch = (f4.filter(CoGVector));
 
     pitchVector.push_back(CoG_pitch);
-    CoG_pitch_vel = f1.filter(pitchVector,0); // Divide by sampling time
+    CoG_pitch_vel = f1.filter(pitchVector); // Divide by sampling time
 
     if(CoG_pitch_vel > 10){
         CoG_pitch_vel = 10;

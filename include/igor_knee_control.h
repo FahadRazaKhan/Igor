@@ -39,7 +39,7 @@
 #include <geometry_msgs/TransformStamped.h>
 #include <visualization_msgs/Marker.h>
 #include "rosgraph_msgs/Clock.h"
-#include <moveit/move_group_interface/move_group_interface.h>
+//#include <moveit/move_group_interface/move_group_interface.h>
 //#include "Iir.h" // iir filter library
 #include <gram_savitzky_golay/gram_savitzky_golay.h> //gram_savitzky_golay lib
 #include <boost/circular_buffer.hpp>
@@ -293,20 +293,20 @@ public:
     
 
     // Window size is 2*m+1
-    const int m1 = 12;
-    const int m2 = 5;
-    const int m3 = 50;
+    const unsigned int m1 = 12;
+    const unsigned int m2 = 5;
+    const unsigned int m3 = 50;
     // Polynomial Order
-    const int n1 = 0;
-    const int n2 = 1;
-    const int n3 = 2;
+    const unsigned int n1 = 0;
+    const unsigned int n2 = 1;
+    const unsigned int n3 = 2;
     // Initial Point Smoothing (ie evaluate polynomial at first point in the window)
     // Points are defined in range [-m;m]
     const int t1 = m1;
     const int t2 = m2;
     const int t3 = m3;
     // Derivate? 0: no derivation, 1: first derivative...
-    const int d = 0;
+    const unsigned int d = 0;
     //double result;
     gram_sg::SavitzkyGolayFilterConfig sg_conf1{m1,t1,n1,d,0.002}; // filter configuration
     gram_sg::SavitzkyGolayFilterConfig sg_conf2{m2,t2,n2,1,0.002}; // filter configuration

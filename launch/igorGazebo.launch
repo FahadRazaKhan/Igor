@@ -45,7 +45,7 @@
 
         <param name="enable_statistics" value="$(arg statistics)" />
 	
-	<node name="cog_publisher_node" pkg="robot_kinetics" type="cog_publisher_node" args="" output="screen" respawn="true">
+	<node name="cog_publisher_node" pkg="robot_kinetics" type="cog_publisher_node" args="" output="screen">
   	</node>
 
 
@@ -65,7 +65,7 @@
 	<!--node name="igor_test_main" pkg="igor" type="igor_test_main_node" output="screen" /-->
 	<node name="igor_markers_node" pkg="igor" type="igor_markers_node" /> <!-- For Igor_knee_controller only-->
 
-  	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find igor)/igor.rviz" />
+  	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find igor)/igor.rviz" output="screen" launch-prefix="xterm -e" />
 	
 
 		<!-- load the controllers -->

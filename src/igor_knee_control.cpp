@@ -161,20 +161,20 @@ void igor_knee_control::body_imu_callback(const sensor_msgs::Imu::ConstPtr &msg)
     //igor_state(2) = floorf(pitch*10000)/10000;
 
     pitchVelVector.push_back(pitch_vel_y);
-    igor_state(5) = pitch_vel_filt.filter(pitchVelVector, 0);
+    igor_state(5) = pitch_vel_filt.filter(pitchVelVector);
     
     igor_state(1) = floorf(yaw*10000)/10000;
 
     yawVelVector.push_back(yaw_vel_z);
-    igor_state(4) = yaw_vel_filt.filter(yawVelVector, 0);
+    igor_state(4) = yaw_vel_filt.filter(yawVelVector);
 
     linearAccelVectorX.push_back(igor_linear_accl.x);
     linearAccelVectorY.push_back(igor_linear_accl.y);
     
 
     plot_vector.data[2] = igor_state(1);
-    plot_vector.data[0] = (linearAccelFiltX.filter(linearAccelVectorX,0))-0.5; // offsetting by 0.5
-    plot_vector.data[1] = linearAccelFiltY.filter(linearAccelVectorY,0);
+    plot_vector.data[0] = (linearAccelFiltX.filter(linearAccelVectorX))-0.5; // offsetting by 0.5
+    plot_vector.data[1] = linearAccelFiltY.filter(linearAccelVectorY);
     //plot_vector.data[2] = igor_linear_accl.z;
 
     //std::cout << "IMU X Acceleration: " << plot_vector.data[0] << std::endl;
@@ -317,9 +317,9 @@ void igor_knee_control::CoG_callback(const geometry_msgs::PointStamped::ConstPtr
     my_data4.push_back(CoG_Position.y);
     my_data5.push_back(CoG_Position.z);
 
-    CoM_acc_x = (f3.filter(my_data3,0));
-    CoM_acc_y = (f4.filter(my_data4,0));
-    CoM_acc_z = (f5.filter(my_data5,0));
+    CoM_acc_x = (f3.filter(my_data3));
+    CoM_acc_y = (f4.filter(my_data4));
+    CoM_acc_z = (f5.filter(my_data5));
 
     CoM_accl << (CoM_acc_x), (CoM_acc_y), (CoM_acc_z);
 
@@ -351,7 +351,7 @@ void igor_knee_control::CoG_callback(const geometry_msgs::PointStamped::ConstPtr
     my_data1.push_back(leanAngle);
     
 
-    CoG_angle_filtered = f1.filter(my_data1, 0);
+    CoG_angle_filtered = f1.filter(my_data1);
  
  
 
@@ -576,45 +576,46 @@ void igor_knee_control::ref_update()
 
     }
 
-    else if (sim_time.toSec()>=10){
+    // else if (sim_time.toSec()>=10){
 
-        Kv(0,0) = -1.5;
-        Kv(1,1) = -30;
-        Kp(0,0) = 0.0;
-        Kp(1,1) = 0.0;
+    //     Kv(0,0) = -1.5;
+    //     Kv(1,1) = -30;
+    //     Kp(0,0) = 0.0;
+    //     Kp(1,1) = 0.0;
 
-        // k_r(0,0) = k_l(0,0) = 0; // Forwad position gain
-        // k_r(0,1) = k_l(0,1) = 0; // Yaw gain
-        // k_r(0,3)= k_l(0,3) = 1.8*(-4.8849); // Forward speed gain -ve
-        // k_r(0,4)= 1.5*(0.4032); // Right wheel Yaw speed gain +ve
-        // k_l(0,4)= -1.5*k_r(0,4); // Left wheel yaw speed gain
+    //     // k_r(0,0) = k_l(0,0) = 0; // Forwad position gain
+    //     // k_r(0,1) = k_l(0,1) = 0; // Yaw gain
+    //     // k_r(0,3)= k_l(0,3) = 1.8*(-4.8849); // Forward speed gain -ve
+    //     // k_r(0,4)= 1.5*(0.4032); // Right wheel Yaw speed gain +ve
+    //     // k_l(0,4)= -1.5*k_r(0,4); // Left wheel yaw speed gain
 
-        ref_state(3) = dwa_linear_velocity;
-        ref_state(4) = dwa_angular_velocity;
+    //     ref_state(3) = dwa_linear_velocity;
+    //     ref_state(4) = dwa_angular_velocity;
 
       
-        ROS_INFO("Linear Vel goal:: %f", ref_state(3));
-        ROS_INFO("Linear Vel: %f", igor_state(3));
-        ROS_INFO("Yaw Vel goal:: %f", ref_state(4));
-        ROS_INFO("Yaw Vel: %f", igor_state(4));
+    //     ROS_INFO("Linear Vel goal:: %f", ref_state(3));
+    //     ROS_INFO("Linear Vel: %f", igor_state(3));
+    //     ROS_INFO("Yaw Vel goal:: %f", ref_state(4));
+    //     ROS_INFO("Yaw Vel: %f", igor_state(4));
 
-        EE_pos_ref(0) = 0.3; // End-effector X reference
-        EE_pos_ref(1) = 0.0; // End-effector Y reference
-        EE_vel_ref(0) = 0; // End-effector X velocity reference
-        EE_vel_ref(1) = 0; // End-effector Y velocity reference
+    //     EE_pos_ref(0) = 0.3; // End-effector X reference
+    //     EE_pos_ref(1) = 0.0; // End-effector Y reference
+    //     EE_vel_ref(0) = 0; // End-effector X velocity reference
+    //     EE_vel_ref(1) = 0; // End-effector Y velocity reference
 
-        accl_d(0) = 0; // Endeffector X acceleration
-        accl_d(1) = 0; // Endeffector Y acceleration
+    //     accl_d(0) = 0; // Endeffector X acceleration
+    //     accl_d(1) = 0; // Endeffector Y acceleration
 
     
-    }
+    // }
 
     else{
         
+        Kp(0,0) = 0.0;
         //ref_state(0) = 0*(sin(0.3*ros::Time::now().toSec())); // forward position
         //ref_state(0) = igor_state(0)-0.5; // forward position
         ref_state(1) = 0.0; // yaw
-        ref_state(3) = -0.2*0; // Forward speed
+        ref_state(3) = 0.2; // Forward speed
         ROS_INFO("ref_state(0): %f", ref_state(0));
         ROS_INFO("ref_state(3): %f", ref_state(3));
         ROS_INFO("igor_state(3): %f", igor_state(3));

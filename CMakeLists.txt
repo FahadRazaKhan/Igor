@@ -22,7 +22,6 @@ find_package(catkin REQUIRED COMPONENTS
   visualization_msgs
   hebiros
   hebi_cpp_api
-  moveit_ros_planning_interface
 )
 
 ##find_package(iir)
@@ -121,7 +120,7 @@ find_package(gram_savitzky_golay REQUIRED)
 catkin_package(
   INCLUDE_DIRS include
 #  LIBRARIES igor
-  CATKIN_DEPENDS roscpp rospy std_msgs tf sensor_msgs geometry_msgs nav_msgs message_filters rosgraph_msgs gazebo_msgs tf_conversions visualization_msgs hebi_cpp_api moveit_ros_planning_interface
+  CATKIN_DEPENDS roscpp rospy std_msgs tf sensor_msgs geometry_msgs nav_msgs message_filters rosgraph_msgs gazebo_msgs tf_conversions visualization_msgs hebi_cpp_api
 #  DEPENDS system_lib
 )
 
