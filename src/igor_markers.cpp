@@ -27,7 +27,7 @@ void igor_markers::ref_frame_callback(const nav_msgs::Odometry::ConstPtr &msg)
 
 
 
-    ref_marker.header.frame_id = "/map";
+    ref_marker.header.frame_id = "map";
     ref_marker.header.stamp = ros::Time::now();
     ref_marker.ns = "sphere_shape";
     ref_marker.id = 0;
@@ -75,7 +75,7 @@ void igor_markers::support_line(const nav_msgs::Odometry::ConstPtr &msg){
     Rwheel_position.z = transformStampedR.transform.translation.z;
 
 
-    support_line_marker.header.frame_id = "/base_link";
+    support_line_marker.header.frame_id = "base_link";
     support_line_marker.header.stamp = ros::Time::now();
     support_line_marker.ns = "line_shape";
     support_line_marker.id = 1;
@@ -109,7 +109,7 @@ void igor_markers::zram_callback(const geometry_msgs::Vector3::ConstPtr &msg)
     zram_.y = msg->y;
     zram_.z = msg->z;
 
-    zram_marker.header.frame_id = "/map";
+    zram_marker.header.frame_id = "map";
     zram_marker.header.stamp = ros::Time::now();
     zram_marker.ns = "sphere_shape";
     zram_marker.id = 2;
@@ -141,7 +141,7 @@ void igor_markers::zram_callback(const geometry_msgs::Vector3::ConstPtr &msg)
 
     
 
-    zramArrow_marker.header.frame_id = "/map";
+    zramArrow_marker.header.frame_id = "map";
     zramArrow_marker.header.stamp = ros::Time::now();
     zramArrow_marker.ns = "Arrow_shape";
     zramArrow_marker.id = 6;
@@ -169,7 +169,7 @@ void igor_markers::f_callback(const geometry_msgs::Vector3::ConstPtr &msg){
     f_.y = msg->y;
     f_.z = msg->z;
 
-    f_marker.header.frame_id = "/map";
+    f_marker.header.frame_id = "map";
     f_marker.header.stamp = ros::Time::now();
     f_marker.ns = "sphere_shape";
     f_marker.id = 3;
