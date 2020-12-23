@@ -102,9 +102,9 @@ void odom_callback(const nav_msgs::Odometry::ConstPtr &msg)
     plot_vector.data[9] = baseY;
     //ROS_INFO("Pitch angle %f",igorState(2));
 
-    //CT_controller(igorState); // Calling CT controller
-    // LQR_controller(igorState); // Calling LQR controller
-    ff_fb_controller();
+    CT_controller(igorState); // Calling CT controller
+    //LQR_controller(igorState); // Calling LQR controller
+    // ff_fb_controller();
 
 } // End of odom_callback
 
@@ -114,10 +114,10 @@ void ref_update(){
     wall_duration = ros::WallTime::now() - wall_begin;
     ROS_INFO("WALL:%u.%09u", wall_duration.sec, wall_duration.nsec);
     // Reference states
-    if (wall_duration.sec>=10){
+    if (wall_duration.sec>=15){
         //plot_vector.data[1] = refState(0) = 0.5*(sin(0.7*ros::Time::now().toSec())); // Center Position
         plot_vector.data[1] = refState(0) = 0.5*0; // Center Position  
-        plot_vector.data[3] = refState(1) = 0*M_PI/4*(cos(0.3*ros::Time::now().toSec())); // Yaw
+        plot_vector.data[3] = refState(1) = 0*(cos(0.3*ros::Time::now().toSec())); // Yaw
         plot_vector.data[5] = refState(2) = -0.004*0; // Pitch
         refState(3) = 0.0; // Center velocity
         refState(4) = 0.0; // Yaw velocity
@@ -195,14 +195,14 @@ void CT_controller(Eigen::VectorXf vec) // Computed Torque controller
     // ROS_INFO("Right Torque %f", CT_trq_r);
     // ROS_INFO("Left Torque %f", CT_trq_l);
 
-    // (*wheelGroupCommand).clear(); // Clearing the previous group commands
-    // (*wheelGroupCommand)[1].actuator().effort().set(-CT_trq_r); // Effort command to Right wheel
-    // (*wheelGroupCommand)[0].actuator().effort().set(CT_trq_l); // Effort command to Left wheel
-    // wheel_group->sendCommand(*wheelGroupCommand); // Send commands
+    (*wheelGroupCommand).clear(); // Clearing the previous group commands
+    (*wheelGroupCommand)[1].actuator().effort().set(-CT_trq_r); // Effort command to Right wheel
+    (*wheelGroupCommand)[0].actuator().effort().set(CT_trq_l); // Effort command to Left wheel
+    wheel_group->sendCommand(*wheelGroupCommand); // Send commands
 
-    // plot_vector.data[8] = CT_trq_l;
-    // plot_vector.data[7] = CT_trq_r;
-    // array_publisher.publish(plot_vector);
+    plot_vector.data[8] = CT_trq_l;
+    plot_vector.data[7] = CT_trq_r;
+    array_publisher.publish(plot_vector);
 
 
     return;
@@ -253,14 +253,14 @@ void ff_fb_controller() // feedforward+feedback controller
     trq_l = lqr_trq_l+CT_trq_l;
     trq_r = lqr_trq_r+CT_trq_r;
 
-    (*wheelGroupCommand).clear(); // Clearing the previous group commands
-    (*wheelGroupCommand)[1].actuator().effort().set(-trq_r); // Effort command to Right wheel
-    (*wheelGroupCommand)[0].actuator().effort().set(trq_l); // Effort command to Left wheel
-    wheel_group->sendCommand(*wheelGroupCommand); // Send commands
+    // (*wheelGroupCommand).clear(); // Clearing the previous group commands
+    // (*wheelGroupCommand)[1].actuator().effort().set(-trq_r); // Effort command to Right wheel
+    // (*wheelGroupCommand)[0].actuator().effort().set(trq_l); // Effort command to Left wheel
+    // wheel_group->sendCommand(*wheelGroupCommand); // Send commands
 
-    plot_vector.data[8] = trq_l; // left wheel torque
-    plot_vector.data[7] = trq_r; // right wheel torque
-    array_publisher.publish(plot_vector);
+    // plot_vector.data[8] = trq_l; // left wheel torque
+    // plot_vector.data[7] = trq_r; // right wheel torque
+    // array_publisher.publish(plot_vector);
 
     return;
 
@@ -415,24 +415,24 @@ int main(int argc, char **argv)
 
 
     // LQR gains for ff_fb_controller
-    k_r(0,0)= k_l(0,0) = 1*(-0.7071); // Forward position gain -ve
-    k_r(0,1)= 1*(0.7071); // Yaw gain +ve
-    k_r(0,2)= k_l(0,2) = 1*(-16.2331); // Pitch gain -ve
-    k_r(0,3)= k_l(0,3) = 0.65*(-4.8849); // Forward speed gain -ve
-    k_r(0,4)= 0.5*(0.4032); // Yaw speed gain +ve
-    k_r(0,5)= k_l(0,5)= 1.1*(-3.1893); // Pitch speed gain -ve
-    k_l(0,1)= -1*k_r(0,1);
-    k_l(0,4)= -1*k_r(0,4);
-
-    // LQR gains
-    // k_r(0,0)= k_l(0,0) = 4*(-0.7071); // Forward position gain -ve
-    // k_r(0,1)= 2*(0.7071); // Yaw gain +ve
-    // k_r(0,2)= k_l(0,2) = 1.2*(-16.2331); // Pitch gain -ve
-    // k_r(0,3)= k_l(0,3) = (-4.8849); // Forward speed gain -ve
-    // k_r(0,4)= (0.4032); // Yaw speed gain +ve
-    // k_r(0,5)= k_l(0,5)= 1.5*(-3.1893); // Pitch speed gain -ve
+    // k_r(0,0)= k_l(0,0) = 1*(-0.7071); // Forward position gain -ve
+    // k_r(0,1)= 1*(0.7071); // Yaw gain +ve
+    // k_r(0,2)= k_l(0,2) = 1*(-16.2331); // Pitch gain -ve
+    // k_r(0,3)= k_l(0,3) = 0.65*(-4.8849); // Forward speed gain -ve
+    // k_r(0,4)= 0.5*(0.4032); // Yaw speed gain +ve
+    // k_r(0,5)= k_l(0,5)= 1.1*(-3.1893); // Pitch speed gain -ve
     // k_l(0,1)= -1*k_r(0,1);
     // k_l(0,4)= -1*k_r(0,4);
+
+    // LQR gains
+    k_r(0,0)= k_l(0,0) = 4*(-0.7071); // Forward position gain -ve
+    k_r(0,1)= 2*(0.7071); // Yaw gain +ve
+    k_r(0,2)= k_l(0,2) = 1.2*(-16.2331); // Pitch gain -ve
+    k_r(0,3)= k_l(0,3) = (-4.8849); // Forward speed gain -ve
+    k_r(0,4)= (0.4032); // Yaw speed gain +ve
+    k_r(0,5)= k_l(0,5)= 1.5*(-3.1893); // Pitch speed gain -ve
+    k_l(0,1)= -1*k_r(0,1);
+    k_l(0,4)= -1*k_r(0,4);
 
 
     // LQR testing

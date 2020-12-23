@@ -33,24 +33,24 @@ igor_knee_control::igor_knee_control(ros::NodeHandle* nodehandle):nh_(*nodehandl
     igor_state_publisher = nh_.advertise<std_msgs::Float32MultiArray>( "/igor/igor_state", 5);
 
     // LQR gains
-    k_r(0,0)= k_l(0,0) = 4*(-0.7071); // Forward position gain -ve
-    k_r(0,1)= 2*(0.7071); // Yaw gain +ve
-    k_r(0,2)= k_l(0,2) = 1.2*(-16.2331); // Pitch gain -ve
-    k_r(0,3)= k_l(0,3) = (-4.8849); // Forward speed gain -ve
-    k_r(0,4)= (0.4032); // Yaw speed gain +ve
-    k_r(0,5)= k_l(0,5)= 1.5*(-3.1893); // Pitch speed gain -ve
-    k_l(0,1)= -1*k_r(0,1);
-    k_l(0,4)= -1*k_r(0,4);
-
-    // LQR gains for ff_fb_controller
-    // k_r(0,0)= k_l(0,0) = (-0.7071); // Forward position gain -ve
-    // k_r(0,1)= (0.7071); // Yaw gain +ve
-    // k_r(0,2)= k_l(0,2) = (-16.2331); // Pitch gain -ve
-    // k_r(0,3)= k_l(0,3) = 0.65*(-4.8849); // Forward speed gain -ve
-    // k_r(0,4)= 0.5*(0.4032); // Yaw speed gain +ve
-    // k_r(0,5)= k_l(0,5)= 1.2*(-3.1893); // Pitch speed gain -ve
+    // k_r(0,0)= k_l(0,0) = 4*(-0.7071); // Forward position gain -ve
+    // k_r(0,1)= 2*(0.7071); // Yaw gain +ve
+    // k_r(0,2)= k_l(0,2) = 1.2*(-16.2331); // Pitch gain -ve
+    // k_r(0,3)= k_l(0,3) = (-4.8849); // Forward speed gain -ve
+    // k_r(0,4)= (0.4032); // Yaw speed gain +ve
+    // k_r(0,5)= k_l(0,5)= 1.5*(-3.1893); // Pitch speed gain -ve
     // k_l(0,1)= -1*k_r(0,1);
     // k_l(0,4)= -1*k_r(0,4);
+
+    // LQR gains for ff_fb_controller
+    k_r(0,0)= k_l(0,0) = (-0.7071); // Forward position gain -ve
+    k_r(0,1)= (0.7071); // Yaw gain +ve
+    k_r(0,2)= k_l(0,2) = (-16.2331); // Pitch gain -ve
+    k_r(0,3)= k_l(0,3) = 0.65*(-4.8849); // Forward speed gain -ve
+    k_r(0,4)= 0.5*(0.4032); // Yaw speed gain +ve
+    k_r(0,5)= k_l(0,5)= 1.2*(-3.1893); // Pitch speed gain -ve
+    k_l(0,1)= -1*k_r(0,1);
+    k_l(0,4)= -1*k_r(0,4);
 
     // Viscous friction matrix
     V_h(0,0) = 48.4376;  
@@ -102,7 +102,7 @@ igor_knee_control::igor_knee_control(ros::NodeHandle* nodehandle):nh_(*nodehandl
     ref_state(5) = 0; // Pitch velocity
 
 
-    plot_vector.data.resize(10); // Resizing std::msg array
+    plot_vector.data.resize(12); // Resizing std::msg array
     pub_igor_state.data.resize(5);
 
     // Manipulator gains
@@ -173,7 +173,7 @@ void igor_knee_control::body_imu_callback(const sensor_msgs::Imu::ConstPtr &msg)
     
 
     plot_vector.data[2] = igor_state(1);
-    plot_vector.data[0] = (linearAccelFiltX.filter(linearAccelVectorX))-0.5; // offsetting by 0.5
+    //plot_vector.data[0] = (linearAccelFiltX.filter(linearAccelVectorX))-0.5; // offsetting by 0.5
     plot_vector.data[1] = linearAccelFiltY.filter(linearAccelVectorY);
     //plot_vector.data[2] = igor_linear_accl.z;
 
@@ -247,7 +247,7 @@ void igor_knee_control::odom_callback(const nav_msgs::Odometry::ConstPtr &msg)
 
     //ROS_INFO("Igor Position: %f",igor_center_position);
 
-    //plot_vector.data[0] = igor_state(0);
+    plot_vector.data[0] = igor_state(0);
     //plot_vector.data[6] = igor_state(3);
     
     plot_vector.data[9] = igor_pos_y;
@@ -365,9 +365,9 @@ void igor_knee_control::CoG_callback(const geometry_msgs::PointStamped::ConstPtr
     plot_vector.data[5] = zram.y();
     plot_vector.data[6] = zram.z();
 
-    //this->lqr_controller(igor_state);
-    this->CT_controller(igor_state);
-    //this->ff_fb_controller();
+    this->lqr_controller(igor_state);
+    //this->CT_controller(igor_state);
+    // this->ff_fb_controller();
 
 
 } // End of CoG_callback
@@ -439,8 +439,8 @@ void igor_knee_control::lqr_controller (Eigen::VectorXf vec) //LQR State-feedbac
         lqr_left_trq = lqr_trq_l.data =  (k_l*(ref_state-vec)).value();
         
 
-        // Lwheel_pub.publish(lqr_trq_l); // Publish left wheel torque
-        // Rwheel_pub.publish(lqr_trq_r); // Publish right wheel torque
+        Lwheel_pub.publish(lqr_trq_l); // Publish left wheel torque
+        Rwheel_pub.publish(lqr_trq_r); // Publish right wheel torque
 
     
 
@@ -449,19 +449,19 @@ void igor_knee_control::lqr_controller (Eigen::VectorXf vec) //LQR State-feedbac
     else if (igor_state(2)<= -1.4 || igor_state(2) >= 1.4){
         lqr_right_trq = lqr_trq_r.data = 0;
         lqr_left_trq = lqr_trq_l.data = 0;
-        // Lwheel_pub.publish(lqr_trq_l);
-        // Rwheel_pub.publish(lqr_trq_r);
+        Lwheel_pub.publish(lqr_trq_l);
+        Rwheel_pub.publish(lqr_trq_r);
         
         // ROS_INFO("Reseting Model");
         // ros::Duration(0.5).sleep(); // sleep for half a second
         // client.call(srv); // Calling the service to reset robot model in gazebo
     }
     
-    // plot_vector.data[7] = lqr_right_trq;
-    // plot_vector.data[8] = lqr_left_trq;
+    plot_vector.data[10] = lqr_right_trq;
+    plot_vector.data[11] = lqr_left_trq;
     
-    // plot_publisher.publish(plot_vector);
-    // igor_state_publisher.publish(pub_igor_state);
+    plot_publisher.publish(plot_vector);
+    igor_state_publisher.publish(pub_igor_state);
 
     
 } // End of lqr_controller
@@ -502,6 +502,8 @@ void igor_knee_control::CT_controller(Eigen::VectorXf vec) // Computed Torque co
     Ep(0) = ref_state(0)-vec(0);
     Ep(1) = ref_state(1)-vec(1);
     Ep(2) = ref_state(2)-vec(2);
+
+    //std::cout << "Pos Errors: " << std::endl << Ep << std::endl; 
     
     // Velocity errors
     Ev(0) = ref_state(3)-vec(3);
@@ -517,14 +519,14 @@ void igor_knee_control::CT_controller(Eigen::VectorXf vec) // Computed Torque co
     CT_trq_l.data = output_trq(0); // Left wheel torque
     
     
-    Lwheel_pub.publish(CT_trq_l);
-    Rwheel_pub.publish(CT_trq_r);
+    // Lwheel_pub.publish(CT_trq_l);
+    // Rwheel_pub.publish(CT_trq_r);
     
 
-    // plot_vector.data[7] = output_trq(1); // Right wheel torque
-    // plot_vector.data[8] = output_trq(0); // Left wheel torque
-    plot_publisher.publish(plot_vector);
-    igor_state_publisher.publish(pub_igor_state);
+    // plot_vector.data[10] = output_trq(1); // Right wheel torque
+    // plot_vector.data[11] = output_trq(0); // Left wheel torque
+    // plot_publisher.publish(plot_vector);
+    // igor_state_publisher.publish(pub_igor_state);
 
 
 }// End of CT_controller
@@ -534,14 +536,14 @@ void igor_knee_control::ff_fb_controller(){
     this->lqr_controller(igor_state);
     this->CT_controller(igor_state);
     
-    // plot_vector.data[8] = trq_l.data = output_trq(0) + lqr_left_trq;
-    // plot_vector.data[7] = trq_r.data = output_trq(1) + lqr_right_trq;
+    // plot_vector.data[11] = trq_l.data = output_trq(0) + lqr_left_trq;
+    // plot_vector.data[10] = trq_r.data = output_trq(1) + lqr_right_trq;
 
     // Lwheel_pub.publish(trq_l);
     // Rwheel_pub.publish(trq_r);
 
 
-    //plot_publisher.publish(plot_vector);
+    // plot_publisher.publish(plot_vector);
     // igor_state_publisher.publish(pub_igor_state);
 
 }// End of ff_fb_controller
@@ -552,7 +554,7 @@ void igor_knee_control::ref_update()
 
     ROS_INFO("In ref_update");
 
-
+    
     if (abs(plot_vector.data[0])>=2.0){
 
 
@@ -561,14 +563,16 @@ void igor_knee_control::ref_update()
         accl_d(0) = -2*plot_vector.data[0]; // Endeffector X acceleration
         accl_d(1) = 0; // Endeffector Y acceleration
         
-        ref_state(3) = 0; // Forward speed
+        //ref_state(0) = 0.5; //Forward position
+        // ref_state(3) = 0; // Forward speed
+        // ref_state(1) = cos(0.3*ros::Time::now().toSec()); // Yaw
 
 
 
 
     }
 
-    else if(abs(igor_state(4))>=1.0 && abs(igor_state(4))<=3.5){
+    else if(abs(igor_state(4))>=1.5 && abs(igor_state(4))<=3.5){
 
 
         accl_d(0) = -2*igor_state(4)*cos(M_PI/2); // Endeffector X acceleration
@@ -576,49 +580,64 @@ void igor_knee_control::ref_update()
 
     }
 
-    // else if (sim_time.toSec()>=10){
+    else if (sim_time.toSec()>=10){
 
-    //     Kv(0,0) = -1.5;
-    //     Kv(1,1) = -30;
-    //     Kp(0,0) = 0.0;
-    //     Kp(1,1) = 0.0;
+        // Kv(0,0) = -1.5;
+        // Kv(1,1) = -30;
+        // Kp(0,0) = 0.0;
+        // Kp(1,1) = 0.0;
 
-    //     // k_r(0,0) = k_l(0,0) = 0; // Forwad position gain
-    //     // k_r(0,1) = k_l(0,1) = 0; // Yaw gain
-    //     // k_r(0,3)= k_l(0,3) = 1.8*(-4.8849); // Forward speed gain -ve
-    //     // k_r(0,4)= 1.5*(0.4032); // Right wheel Yaw speed gain +ve
-    //     // k_l(0,4)= -1.5*k_r(0,4); // Left wheel yaw speed gain
+        // LQR Gains for DWA planner
+        // k_r(0,0) = k_l(0,0) = 0; // Forwad position gain
+        // k_r(0,1) = k_l(0,1) = 0; // Yaw gain
+        // k_r(0,3)= k_l(0,3) = 4*(-4.8849); // Forward speed gain -ve
+        // k_r(0,4)= 1*(0.4032); // Right wheel Yaw speed gain +ve
+        // k_l(0,4)= -1*k_r(0,4); // Left wheel yaw speed gain
 
-    //     ref_state(3) = dwa_linear_velocity;
-    //     ref_state(4) = dwa_angular_velocity;
+
+        // LQR Gains for FTC planner
+        k_r(0,0) = k_l(0,0) = 0; // Forwad position gain
+        k_r(0,1) = k_l(0,1) = 0; // Yaw gain
+        k_r(0,3)= k_l(0,3) = 1.2*(-4.8849); // Forward speed gain -ve
+        k_r(0,4)= 5*(0.4032); // Right wheel Yaw speed gain +ve
+        k_l(0,4)= -1*k_r(0,4); // Left wheel yaw speed gain
+
+        ref_state(3) = dwa_linear_velocity;
+        ref_state(4) = dwa_angular_velocity;
 
       
-    //     ROS_INFO("Linear Vel goal:: %f", ref_state(3));
-    //     ROS_INFO("Linear Vel: %f", igor_state(3));
-    //     ROS_INFO("Yaw Vel goal:: %f", ref_state(4));
-    //     ROS_INFO("Yaw Vel: %f", igor_state(4));
+        ROS_INFO("Linear Vel goal:: %f", ref_state(3));
+        ROS_INFO("Linear Vel: %f", igor_state(3));
+        ROS_INFO("Yaw Vel goal:: %f", ref_state(4));
+        ROS_INFO("Yaw Vel: %f", igor_state(4));
 
-    //     EE_pos_ref(0) = 0.3; // End-effector X reference
-    //     EE_pos_ref(1) = 0.0; // End-effector Y reference
-    //     EE_vel_ref(0) = 0; // End-effector X velocity reference
-    //     EE_vel_ref(1) = 0; // End-effector Y velocity reference
+        EE_pos_ref(0) = 0.3; // End-effector X reference
+        EE_pos_ref(1) = 0.0; // End-effector Y reference
+        EE_vel_ref(0) = 0; // End-effector X velocity reference
+        EE_vel_ref(1) = 0; // End-effector Y velocity reference
 
-    //     accl_d(0) = 0; // Endeffector X acceleration
-    //     accl_d(1) = 0; // Endeffector Y acceleration
+        accl_d(0) = 0; // Endeffector X acceleration
+        accl_d(1) = 0; // Endeffector Y acceleration
 
     
-    // }
+    }
 
     else{
         
-        Kp(0,0) = 0.0;
+        //Kp(0,0) = 0.0;
         //ref_state(0) = 0*(sin(0.3*ros::Time::now().toSec())); // forward position
         //ref_state(0) = igor_state(0)-0.5; // forward position
         ref_state(1) = 0.0; // yaw
-        ref_state(3) = 0.2; // Forward speed
-        ROS_INFO("ref_state(0): %f", ref_state(0));
-        ROS_INFO("ref_state(3): %f", ref_state(3));
-        ROS_INFO("igor_state(3): %f", igor_state(3));
+        ref_state(3) = -0.4*0; // Forward speed
+        
+        // ROS_INFO("Forward Pos goal: %f", ref_state(0));
+        // ROS_INFO("Yaw Pos goal: %f", ref_state(1));
+        // ROS_INFO("Pitch goal: %f", ref_state(2));
+        // ROS_INFO("Forward speed goal: %f", ref_state(3));
+        // ROS_INFO("Yaw rate goal: %f", ref_state(4));
+        // ROS_INFO("Pitch rate goal: %f", ref_state(5));
+        
+        // ROS_INFO("igor_state(3): %f", igor_state(3));
 
 
         EE_pos_ref(0) = 0.3; // End-effector X reference
@@ -636,7 +655,7 @@ void igor_knee_control::ref_update()
     //hip_ref.data = 0*-1.0*abs(sin(0.3*ros::Time::now().toSec()));
 
     //plot_vector.data[1] = ref_state(0);
-    //plot_vector.data[3] = ref_state(1);
+    plot_vector.data[3] = ref_state(1);
     //plot_vector.data[5] = ref_state(2); 
     
 }// End of ref_update function
@@ -657,12 +676,12 @@ igor_knee_control myNode(&nh); // creating the igor_knee_control object
 
 ros::Duration(0.1).sleep();
 //ros::spin(); // only need for subscriber to call its callback function (Does not need for Publisher).
-// ros::MultiThreadedSpinner spinner(5); // Use 5 threads for 5 callbacks in parallel
-// spinner.spin(); // spin() will not return until the node has been shutdown
+ros::MultiThreadedSpinner spinner(6); // Use 6 threads for 6 callbacks in parallel
+spinner.spin(); // spin() will not return until the node has been shutdown
 
-ros::AsyncSpinner async_spinner(6);
-async_spinner.start();
-ros::waitForShutdown();
+// ros::AsyncSpinner async_spinner(6);
+// async_spinner.start();
+// ros::waitForShutdown();
 
 return 0;
 
