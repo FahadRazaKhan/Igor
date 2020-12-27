@@ -173,7 +173,7 @@ void igor_knee_control::body_imu_callback(const sensor_msgs::Imu::ConstPtr &msg)
     
 
     plot_vector.data[2] = igor_state(1);
-    //plot_vector.data[0] = (linearAccelFiltX.filter(linearAccelVectorX))-0.5; // offsetting by 0.5
+    linearAccelerationX = (linearAccelFiltX.filter(linearAccelVectorX))-0.585; // offsetting by 0.5
     plot_vector.data[1] = linearAccelFiltY.filter(linearAccelVectorY);
     //plot_vector.data[2] = igor_linear_accl.z;
 
@@ -605,19 +605,82 @@ void igor_knee_control::ref_update()
         ref_state(3) = dwa_linear_velocity;
         ref_state(4) = dwa_angular_velocity;
 
+        forwardAcceleration = linearAccelerationX*cos(igor_state(2));
+
       
         ROS_INFO("Linear Vel goal:: %f", ref_state(3));
         ROS_INFO("Linear Vel: %f", igor_state(3));
         ROS_INFO("Yaw Vel goal:: %f", ref_state(4));
         ROS_INFO("Yaw Vel: %f", igor_state(4));
 
-        EE_pos_ref(0) = 0.3; // End-effector X reference
-        EE_pos_ref(1) = 0.0; // End-effector Y reference
-        EE_vel_ref(0) = 0; // End-effector X velocity reference
-        EE_vel_ref(1) = 0; // End-effector Y velocity reference
+        if(ref_state(4)<0){
 
-        accl_d(0) = 0; // Endeffector X acceleration
-        accl_d(1) = 0; // Endeffector Y acceleration
+            // Manipulator gains
+            K_pos(0,0) = 16;
+            K_pos(0,1) = 0;
+            K_pos(1,0) = 0;
+            K_pos(1,1) = 16;
+
+            K_vel(0,0) = 15;
+            K_vel(0,1) = 0;
+            K_vel(1,0) = 0;
+            K_vel(1,1) = 15;
+
+            EE_pos_ref(0) = 0.1; // End-effector X reference
+            EE_pos_ref(1) = 0.4; // End-effector Y reference
+            EE_vel_ref(0) = 0; // End-effector X velocity reference
+            EE_vel_ref(1) = 0; // End-effector Y velocity reference
+
+            accl_d(0) = 0; // Endeffector X acceleration
+            accl_d(1) = 0; // Endeffector Y acceleration
+
+        }
+        else if(ref_state(4)>0){
+
+            // Manipulator gains
+            K_pos(0,0) = 16;
+            K_pos(0,1) = 0;
+            K_pos(1,0) = 0;
+            K_pos(1,1) = 16;
+
+            K_vel(0,0) = 15;
+            K_vel(0,1) = 0;
+            K_vel(1,0) = 0;
+            K_vel(1,1) = 15;
+
+            EE_pos_ref(0) = 0.1; // End-effector X reference
+            EE_pos_ref(1) = -0.4; // End-effector Y reference
+            EE_vel_ref(0) = 0; // End-effector X velocity reference
+            EE_vel_ref(1) = 0; // End-effector Y velocity reference
+
+            accl_d(0) = 0; // Endeffector X acceleration
+            accl_d(1) = 0; // Endeff
+
+        }
+        else{
+
+            // Manipulator gains
+            K_pos(0,0) = 16;
+            K_pos(0,1) = 0;
+            K_pos(1,0) = 0;
+            K_pos(1,1) = 16;
+
+            K_vel(0,0) = 15;
+            K_vel(0,1) = 0;
+            K_vel(1,0) = 0;
+            K_vel(1,1) = 15;
+
+            EE_pos_ref(0) = 0.3; // End-effector X reference
+            EE_pos_ref(1) = 0; // End-effector Y reference
+            EE_vel_ref(0) = 0; // End-effector X velocity reference
+            EE_vel_ref(1) = 0; // End-effector Y velocity reference
+
+            accl_d(0) = 0; // Endeffector X acceleration
+            accl_d(1) = 0; // Endeff
+
+
+        }
+        
 
     
     }
@@ -655,7 +718,7 @@ void igor_knee_control::ref_update()
     //hip_ref.data = 0*-1.0*abs(sin(0.3*ros::Time::now().toSec()));
 
     //plot_vector.data[1] = ref_state(0);
-    plot_vector.data[3] = ref_state(1);
+    plot_vector.data[3] = forwardAcceleration;
     //plot_vector.data[5] = ref_state(2); 
     
 }// End of ref_update function

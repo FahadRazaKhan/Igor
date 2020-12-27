@@ -152,6 +152,9 @@ private:
     float dwa_linear_velocity = 0.0;
     float dwa_angular_velocity = 0.0;
 
+    float linearAccelerationX = 0;
+    float forwardAcceleration = 0;
+
 
 
     
