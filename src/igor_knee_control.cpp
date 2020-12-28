@@ -626,10 +626,15 @@ void igor_knee_control::ref_update()
             K_vel(1,0) = 0;
             K_vel(1,1) = 15;
 
-            EE_pos_ref(0) = 0.1; // End-effector X reference
+            EE_pos_ref(0) = 0.15; // End-effector X reference
             EE_pos_ref(1) = 0.4; // End-effector Y reference
             EE_vel_ref(0) = 0; // End-effector X velocity reference
             EE_vel_ref(1) = 0; // End-effector Y velocity reference
+
+            // EE_pos_ref(0) = 0.3; // End-effector X reference
+            // EE_pos_ref(1) = 0; // End-effector Y reference
+            // EE_vel_ref(0) = 0; // End-effector X velocity reference
+            // EE_vel_ref(1) = 0; // 
 
             accl_d(0) = 0; // Endeffector X acceleration
             accl_d(1) = 0; // Endeffector Y acceleration
@@ -648,10 +653,15 @@ void igor_knee_control::ref_update()
             K_vel(1,0) = 0;
             K_vel(1,1) = 15;
 
-            EE_pos_ref(0) = 0.1; // End-effector X reference
+            EE_pos_ref(0) = 0.15; // End-effector X reference
             EE_pos_ref(1) = -0.4; // End-effector Y reference
             EE_vel_ref(0) = 0; // End-effector X velocity reference
             EE_vel_ref(1) = 0; // End-effector Y velocity reference
+
+            // EE_pos_ref(0) = 0.3; // End-effector X reference
+            // EE_pos_ref(1) = 0; // End-effector Y reference
+            // EE_vel_ref(0) = 0; // End-effector X velocity reference
+            // EE_vel_ref(1) = 0; // 
 
             accl_d(0) = 0; // Endeffector X acceleration
             accl_d(1) = 0; // Endeff
