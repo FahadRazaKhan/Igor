@@ -7,29 +7,51 @@ disturbance::disturbance() //Constructor
 {
     sub_clk = nh_.subscribe<rosgraph_msgs::Clock>("/clock",10,&disturbance::clk_callback,this);
     client = nh_.serviceClient<gazebo_msgs::ApplyBodyWrench>("/gazebo/apply_body_wrench"); // service client of gazebo service
-    igor_wrench.force.x = 15*0; // Force in newtons
-    igor_wrench.force.y = 0;
-    igor_wrench.force.z = 0;
-    igor_wrench.torque.x = 0; // Moment in Nm
-    igor_wrench.torque.y = 0;
-    igor_wrench.torque.z = 16*0;
-
-    srv.request.body_name = igor_body_name;
-    srv.request.reference_frame = igor_reference_frame;
-    srv.request.wrench = igor_wrench;
-    srv.request.duration = ros::Duration(1); // set duration of wrench to 1 sec
 }
 
 void disturbance::clk_callback(const rosgraph_msgs::Clock::ConstPtr &msg){
 
     my_time = msg->clock;
 
+    // Wrench in body frame
+    force.x = 0.0;
+    force.y = -50.0;
+    force.z = 0.0;
+    moment.x =0.0;
+    moment.y =0.0;
+    moment.z =0.0;
+
+    try
+    { 
+        transformStamped = tfBuffer.lookupTransform("map", "base_link" , ros::Time(0)); // Transform from base_link to map frame
+    }
+    catch (tf2::TransformException &ex) 
+    {
+        ROS_WARN("%s",ex.what());
+    }
     
-    if (my_time.toSec()==10){ // To call the rosservice at the 10th sec
+    tf2::doTransform(force, force, transformStamped); // Transform from base_link to map
+    tf2::doTransform(moment, moment, transformStamped); // Transform from base_link to map
+    
+    igor_wrench.force.x = force.x; // Force in newtons
+    igor_wrench.force.y = force.y;
+    igor_wrench.force.z = force.z;
+    igor_wrench.torque.x = 0*moment.x; // Moment in Nm
+    igor_wrench.torque.y = 0*moment.y;
+    igor_wrench.torque.z = 0*moment.z;
+    srv.request.body_name = igor_body_name;
+    srv.request.wrench = igor_wrench;
+    srv.request.duration = ros::Duration(1);
+
+    if (my_time.toSec()==15 || my_time.toSec()==50){ // To call the rosservice at the 10th sec
         if(!run){
-            ROS_INFO("Calling Apply_Body_Wrench Service");
+            ROS_INFO("Calling Apply_Body_Wrench Service @ %f secs", my_time.toSec() );
+            std::cout << "Wrench vector: " << igor_wrench << std::endl;
             client.call(srv); // Call the service
-            run = true; // Run only once
+            //run = true; // Run only once
+            if(srv.response.success){
+                ROS_INFO("Wrench applied successfully");
+            } 
         }
 
     }
