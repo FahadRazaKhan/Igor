@@ -6,7 +6,7 @@
 #include "gazebo_msgs/ApplyBodyWrench.h"
 #include "geometry_msgs/Wrench.h"
 #include <string>
-#include <gazebo/physics/physics.hh>
+//#include <gazebo/physics/physics.hh>
 #include <tf2_ros/transform_listener.h>
 #include <tf2_ros/buffer.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
@@ -28,9 +28,9 @@ private:
     geometry_msgs::Wrench igor_wrench;
     gazebo_msgs::ApplyBodyWrench srv;
 
-    gazebo::physics::ModelPtr model_;
-    gazebo::physics::WorldPtr world_;
-    gazebo::physics::LinkPtr link_;
+    // gazebo::physics::ModelPtr model_;
+    // gazebo::physics::WorldPtr world_;
+    // gazebo::physics::LinkPtr link_;
 
     tf2_ros::Buffer tfBuffer;
     tf2_ros::TransformListener tf2Listener{tfBuffer};

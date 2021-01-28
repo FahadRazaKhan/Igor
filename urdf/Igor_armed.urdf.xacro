@@ -249,7 +249,7 @@
 	<gazebo>
 		<plugin name="p3d_base_controller" filename= "libgazebo_ros_p3d.so">
 			<robotNamespace>/igor</robotNamespace>
-			<alwaysOn>true</alwaysOn>
+			<alwaysOn>false</alwaysOn>
 			<updateRate>500.0</updateRate>
 			<bodyName>base_link</bodyName>
 			<topicName>odom</topicName>
@@ -264,7 +264,7 @@
 	<gazebo>
 		<plugin name="p3d_base_controller" filename= "libgazebo_ros_p3d.so">
 			<robotNamespace>/igor</robotNamespace>
-			<alwaysOn>true</alwaysOn>
+			<alwaysOn>false</alwaysOn>
 			<updateRate>500.0</updateRate>
 			<bodyName>robot_center_link</bodyName>
 			<topicName>centerOdom</topicName>
@@ -282,7 +282,7 @@
 	<gazebo reference="chassis">
 	    <gravity>true</gravity>
 	    <sensor name="body_imu" type="imu">
-	      <always_on>true</always_on>
+	      <always_on>false</always_on>
 	      <visualize>true</visualize>
 	      <!--topic>__default_topic__</topic-->
 	      <plugin filename="libgazebo_ros_imu_sensor.so" name="imu_plugin">

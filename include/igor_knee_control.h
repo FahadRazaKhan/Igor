@@ -143,7 +143,7 @@ private:
     float CoM_acc_x;
     float CoM_acc_y;
     float CoM_acc_z;
-    float ground_level = 0.1016; // same as wheel radius
+    float ground_level = 0; //0.1016; 
     float alpha = 0;
 
     float pitch_vel_y = 0;
@@ -157,15 +157,6 @@ private:
 
 
 
-    
-    //float filt1 = 0.02817; // LPF const.
-    //float filt2 = 0.9718; // LPF const.
-    
-  
-    //float vel_filt_out = 0;
-    //float vel_filt_in = 0;
-    //float last_vel_filt_out = 0.0;
-    //float last_vel_filt_in = 0.0;
     
     //geometry_msgs::Point ref_origin;
     

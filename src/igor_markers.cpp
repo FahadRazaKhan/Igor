@@ -68,11 +68,11 @@ void igor_markers::support_line(const nav_msgs::Odometry::ConstPtr &msg){
 
     Lwheel_position.x = transformStampedL.transform.translation.x;
     Lwheel_position.y = transformStampedL.transform.translation.y;
-    Lwheel_position.z = transformStampedL.transform.translation.z;
+    Lwheel_position.z = transformStampedL.transform.translation.z-0.1016; // Ground level
 
     Rwheel_position.x = transformStampedR.transform.translation.x;
     Rwheel_position.y = transformStampedR.transform.translation.y;
-    Rwheel_position.z = transformStampedR.transform.translation.z;
+    Rwheel_position.z = transformStampedR.transform.translation.z-0.1016; // Ground level
 
 
     support_line_marker.header.frame_id = "base_link";

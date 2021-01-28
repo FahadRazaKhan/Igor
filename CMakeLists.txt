@@ -24,6 +24,11 @@ find_package(catkin REQUIRED COMPONENTS
   hebi_cpp_api
 )
 
+#find_package(catkin REQUIRED COMPONENTS
+#  gazebo_plugins
+#)
+#find_package(gazebo REQUIRED)
+
 ##find_package(iir)
 find_package(gram_savitzky_golay REQUIRED)
 
@@ -140,13 +145,14 @@ include_directories(
   include
   ${catkin_INCLUDE_DIRS}
   ${eigen3_INCLUDE_DIRS}
+  ${GAZEBO_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
 add_library(igor_states_lib
    src/igor_states.cpp
 ) ## My library
-##add_library(dwa_planner_lib src/dwa_planner.cpp)
+
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -188,7 +194,7 @@ target_link_libraries(igor_2d_controller_node
  )
 
 target_link_libraries(igor_disturber_node
-   ${catkin_LIBRARIES}
+   ${catkin_LIBRARIES} #${GAZEBO_LIBRARIES}
  )
 
 target_link_libraries(igor_3d_controller_node
