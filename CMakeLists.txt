@@ -170,7 +170,7 @@ add_executable(igor_knee_controller_node src/igor_knee_control.cpp)
 add_executable(igor_odom_broadcaster_node src/odom_broadcaster.cpp)
 add_executable(igor_test_main_node src/test_main.cpp)
 add_executable(igor_markers_node src/igor_markers.cpp)
-add_executable(example_01_lookup_node src/example_01_lookup_node.cpp)
+##add_executable(example_01_lookup_node src/example_01_lookup_node.cpp)
 add_executable(igor_jointstate_node src/igor_jointstate_pub.cpp)
 add_executable(igorHW_controller_node src/igorHW_control.cpp)
 
@@ -217,8 +217,8 @@ target_link_libraries(igor_markers_node
    ${catkin_LIBRARIES}
  )
 
-target_link_libraries(example_01_lookup_node 
-   ${catkin_LIBRARIES})
+#target_link_libraries(example_01_lookup_node 
+#   ${catkin_LIBRARIES})
 
 target_link_libraries(igor_jointstate_node
    ${catkin_LIBRARIES})
