@@ -11,9 +11,6 @@ Panels:
         - /PointStamped1
         - /Odometry1
         - /Marker1
-        - /Marker2
-        - /PointStamped2
-        - /Marker3
         - /Path1
         - /Path2
       Splitter Ratio: 0.5137156844139099
@@ -471,14 +468,14 @@ Visualization Manager:
     - Alpha: 1
       Class: rviz/PointStamped
       Color: 52; 101; 164
-      Enabled: true
+      Enabled: false
       History Length: 1
       Name: PointStamped
       Queue Size: 10
       Radius: 0.15000000596046448
       Topic: /cog/robot
       Unreliable: false
-      Value: true
+      Value: false
     - Angle Tolerance: 0.10000000149011612
       Class: rviz/Odometry
       Covariance:
@@ -519,15 +516,15 @@ Visualization Manager:
       Marker Topic: /zram_marker
       Name: Marker
       Namespaces:
-        sphere_shape: true
-      Queue Size: 1
+        Igor: true
+      Queue Size: 5
       Value: true
     - Class: rviz/Marker
       Enabled: true
       Marker Topic: /support_marker
       Name: Marker
       Namespaces:
-        line_shape: true
+        Igor: true
       Queue Size: 1
       Value: true
     - Alpha: 1
@@ -546,8 +543,8 @@ Visualization Manager:
       Marker Topic: /zramArrow_marker
       Name: Marker
       Namespaces:
-        Arrow_shape: true
-      Queue Size: 100
+        Igor: true
+      Queue Size: 10
       Value: true
     - Alpha: 1
       Buffer Length: 1
@@ -557,8 +554,8 @@ Visualization Manager:
       Head Diameter: 0.30000001192092896
       Head Length: 0.20000000298023224
       Length: 0.30000001192092896
-      Line Style: Lines
-      Line Width: 0.029999999329447746
+      Line Style: Billboards
+      Line Width: 0.009999999776482582
       Name: Path
       Offset:
         X: 0
@@ -581,8 +578,8 @@ Visualization Manager:
       Head Diameter: 0.30000001192092896
       Head Length: 0.20000000298023224
       Length: 0.30000001192092896
-      Line Style: Lines
-      Line Width: 0.029999999329447746
+      Line Style: Billboards
+      Line Width: 0.009999999776482582
       Name: Path
       Offset:
         X: 0
@@ -625,7 +622,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 6.467759132385254
+      Distance: 6.6919846534729
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -633,17 +630,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: 0.015449129045009613
-        Y: 1.2656688690185547
-        Z: 0.23455847799777985
+        X: 0.002641440602019429
+        Y: 1.321640133857727
+        Z: -0.2954023480415344
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 1.5597963333129883
+      Pitch: 1.5697963237762451
       Target Frame: <Fixed Frame>
-      Yaw: 4.7066216468811035
+      Yaw: 4.716632843017578
     Saved:
       - Class: rviz/Orbit
         Distance: 2.6209158897399902

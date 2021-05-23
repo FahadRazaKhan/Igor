@@ -173,7 +173,7 @@ add_executable(igor_markers_node src/igor_markers.cpp)
 ##add_executable(example_01_lookup_node src/example_01_lookup_node.cpp)
 add_executable(igor_jointstate_node src/igor_jointstate_pub.cpp)
 add_executable(igorHW_controller_node src/igorHW_control.cpp)
-
+add_executable(igor_l1_controller_node src/igor_l1_control.cpp)
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
 ## target back to the shorter version for ease of user use
@@ -224,6 +224,9 @@ target_link_libraries(igor_jointstate_node
    ${catkin_LIBRARIES})
 
 target_link_libraries(igorHW_controller_node
+   ${catkin_LIBRARIES} gram_savitzky_golay)
+   
+target_link_libraries(igor_l1_controller_node
    ${catkin_LIBRARIES} gram_savitzky_golay)
 #############
 ## Install ##

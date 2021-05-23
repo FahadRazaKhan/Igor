@@ -14,12 +14,12 @@ void disturbance::clk_callback(const rosgraph_msgs::Clock::ConstPtr &msg){
     my_time = msg->clock;
 
     // Wrench in body frame
-    force.x = -32.5*0;
-    force.y = 0.0;
+    force.x = 0.0;
+    force.y = -32;
     force.z = 0.0;
-    moment.x =0.0;
-    moment.y =0.0;
-    moment.z =0.0;
+    moment.x = 0.0;
+    moment.y = 0.0;
+    moment.z = 0.0;
 
     try
     { 
@@ -43,7 +43,7 @@ void disturbance::clk_callback(const rosgraph_msgs::Clock::ConstPtr &msg){
     srv.request.wrench = igor_wrench;
     srv.request.duration = ros::Duration(1);
 
-    if (my_time.toSec()==10 || my_time.toSec()==50){ // To call the rosservice at the 10th sec
+    if (my_time.toSec()==20 || my_time.toSec()==50){ // To call the rosservice at the 10th sec
         if(!run){
             ROS_INFO("Calling Apply_Body_Wrench Service @ %f secs", my_time.toSec() );
             std::cout << "Wrench vector: " << igor_wrench << std::endl;

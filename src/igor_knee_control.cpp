@@ -573,13 +573,12 @@ void igor_knee_control::ref_update()
         k_r(0,0) = k_l(0,0) = 0; // Forwad position gain
         k_r(0,1) = k_l(0,1) = 0; // Yaw gain
         k_r(0,3)= k_l(0,3) = 1.2*(-4.8849); // Forward speed gain -ve
-        k_r(0,4)= 5*(0.4032); // Right wheel Yaw speed gain +ve
+        k_r(0,4)= 2*5*(0.4032); // Right wheel Yaw speed gain +ve
         k_l(0,4)= -1*k_r(0,4); // Left wheel yaw speed gain
 
         ref_state(3) = dwa_linear_velocity;
         ref_state(4) = dwa_angular_velocity;
 
-        //forwardAcceleration = linearAccelerationX*cos(igor_state(2));
 
       
         ROS_INFO("Linear Vel goal:: %f", ref_state(3));
@@ -623,15 +622,15 @@ void igor_knee_control::ref_update()
             K_vel(1,0) = 0;
             K_vel(1,1) = 15;
 
+            // EE_pos_ref(0) = 0.15; // End-effector X reference
+            // EE_pos_ref(1) = -0.4; // End-effector Y reference
+            // EE_vel_ref(0) = 0; // End-effector X velocity reference
+            // EE_vel_ref(1) = 0; // End-effector Y velocity reference
+
             EE_pos_ref(0) = 0.15; // End-effector X reference
-            EE_pos_ref(1) = -0.4; // End-effector Y reference
+            EE_pos_ref(1) = 0.4; // End-effector Y reference
             EE_vel_ref(0) = 0; // End-effector X velocity reference
             EE_vel_ref(1) = 0; // End-effector Y velocity reference
-
-            // EE_pos_ref(0) = 0.15; // End-effector X reference
-            // EE_pos_ref(1) = 0.4; // End-effector Y reference
-            // EE_vel_ref(0) = 0; // End-effector X velocity reference
-            // EE_vel_ref(1) = 0; // End
 
             accl_d(0) = 0; // Endeffector X acceleration
             accl_d(1) = 0; // Endeff
@@ -678,15 +677,6 @@ void igor_knee_control::ref_update()
         ref_state(1) = 0.0; // yaw
         ref_state(3) = -0.4*0; // Forward speed
         
-        // ROS_INFO("Forward Pos goal: %f", ref_state(0));
-        // ROS_INFO("Yaw Pos goal: %f", ref_state(1));
-        // ROS_INFO("Pitch goal: %f", ref_state(2));
-        // ROS_INFO("Forward speed goal: %f", ref_state(3));
-        // ROS_INFO("Yaw rate goal: %f", ref_state(4));
-        // ROS_INFO("Pitch rate goal: %f", ref_state(5));
-        
-        // ROS_INFO("igor_state(3): %f", igor_state(3));
-
 
         EE_pos_ref(0) = 0.3; // End-effector X reference
         EE_pos_ref(1) = 0.0; // End-effector Y reference

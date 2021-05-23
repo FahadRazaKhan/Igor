@@ -29,7 +29,7 @@ void igor_markers::ref_frame_callback(const nav_msgs::Odometry::ConstPtr &msg)
 
     ref_marker.header.frame_id = "map";
     ref_marker.header.stamp = ros::Time::now();
-    ref_marker.ns = "sphere_shape";
+    ref_marker.ns = "Igor";
     ref_marker.id = 0;
     ref_marker.type = visualization_msgs::Marker::SPHERE_LIST;
     ref_marker.action = visualization_msgs::Marker::ADD;
@@ -77,14 +77,14 @@ void igor_markers::support_line(const nav_msgs::Odometry::ConstPtr &msg){
 
     support_line_marker.header.frame_id = "base_link";
     support_line_marker.header.stamp = ros::Time::now();
-    support_line_marker.ns = "line_shape";
+    support_line_marker.ns = "Igor";
     support_line_marker.id = 1;
     support_line_marker.type = visualization_msgs::Marker::LINE_LIST;
     support_line_marker.action = visualization_msgs::Marker::ADD;
     support_line_marker.pose.orientation.w = 1;
     support_line_marker.points.clear();
-    support_line_marker.points.push_back(Lwheel_position);
-    support_line_marker.points.push_back(Rwheel_position);
+    support_line_marker.points.push_back(Lwheel_position);// Tail
+    support_line_marker.points.push_back(Rwheel_position);// Head
     support_line_marker.scale.x = 0.04;
     support_line_marker.color.r = 0.224;
     support_line_marker.color.g = 1;
@@ -109,42 +109,48 @@ void igor_markers::zram_callback(const geometry_msgs::Vector3::ConstPtr &msg)
     zram_.y = msg->y;
     zram_.z = msg->z;
 
+    zram_position.x = msg->x;
+    zram_position.y = msg->y;
+    zram_position.z = msg->z;
+
     zram_marker.header.frame_id = "map";
     zram_marker.header.stamp = ros::Time::now();
-    zram_marker.ns = "sphere_shape";
+    zram_marker.ns = "Igor";
     zram_marker.id = 2;
-    zram_marker.type = visualization_msgs::Marker::SPHERE;
+    zram_marker.type = visualization_msgs::Marker::SPHERE_LIST;
     zram_marker.action = visualization_msgs::Marker::ADD;
-    zram_marker.pose.position.x = zram_.x;
-    zram_marker.pose.position.y = zram_.y;
-    zram_marker.pose.position.z = zram_.z;
+    // zram_marker.pose.position.x = zram_.x;
+    // zram_marker.pose.position.y = zram_.y;
+    // zram_marker.pose.position.z = zram_.z;
     zram_marker.pose.orientation.x = 0;
     zram_marker.pose.orientation.y = 0;
     zram_marker.pose.orientation.z = 0;
     zram_marker.pose.orientation.w = 1;
-    zram_marker.scale.x = 0.08;
-    zram_marker.scale.y = 0.08;
-    zram_marker.scale.z = 0.08;
+    zram_marker.points.push_back(zram_position);
+    if(zram_marker.points.size()>1800){
+        zram_marker.points.erase(zram_marker.points.begin(), zram_marker.points.begin()+1);
+    }
+    zram_marker.scale.x = 0.03;
+    zram_marker.scale.y = 0.03;
+    zram_marker.scale.z = 0.03;
     zram_marker.color.r = 1;
     zram_marker.color.g = 0;
     zram_marker.color.b = 0.855;
     zram_marker.color.a = 1.0;
-    zram_marker.lifetime = ros::Duration();
+    zram_marker.lifetime = ros::Duration(1);
+    zram_marker.points.shrink_to_fit();
+    ros::Duration(0.03).sleep();
     zram_marker_pub.publish(zram_marker);
 
     //*******************************//
 
 
-    zram_position.x = msg->x;
-    zram_position.y = msg->y;
-    zram_position.z = msg->z;
-
     
 
     zramArrow_marker.header.frame_id = "map";
     zramArrow_marker.header.stamp = ros::Time::now();
-    zramArrow_marker.ns = "Arrow_shape";
-    zramArrow_marker.id = 6;
+    zramArrow_marker.ns = "Igor";
+    zramArrow_marker.id = 3;
     zramArrow_marker.type = visualization_msgs::Marker::ARROW;
     zramArrow_marker.action = visualization_msgs::Marker::ADD;
     zramArrow_marker.pose.orientation.w = 1;
@@ -171,8 +177,8 @@ void igor_markers::f_callback(const geometry_msgs::Vector3::ConstPtr &msg){
 
     f_marker.header.frame_id = "map";
     f_marker.header.stamp = ros::Time::now();
-    f_marker.ns = "sphere_shape";
-    f_marker.id = 3;
+    f_marker.ns = "Igor";
+    f_marker.id = 4;
     f_marker.type = visualization_msgs::Marker::SPHERE;
     f_marker.action = visualization_msgs::Marker::ADD;
     f_marker.pose.position.x = f_.x;
