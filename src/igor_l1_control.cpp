@@ -7,6 +7,7 @@ igor_l1_control::igor_l1_control(ros::NodeHandle* nodehandle):nh_(*nodehandle) /
 
     sub_body_imu = nh_.subscribe<sensor_msgs::Imu>("/igor/body_imu/data",1, &igor_l1_control::body_imu_callback,this);
     sub_CoG = nh_.subscribe<geometry_msgs::PointStamped>("/cog/robot",1, &igor_l1_control::CoG_callback,this);
+    sub_odom = nh_.subscribe<nav_msgs::Odometry>("/igor/odom",1, &igor_l1_control::odom_callback,this,ros::TransportHints().tcpNoDelay());
 
     // Vector Initialization 
     X_hat(0) = 0;
@@ -64,9 +65,6 @@ void igor_l1_control::body_imu_callback(const sensor_msgs::Imu::ConstPtr &msg){
     tf::Matrix3x3(quat).getRPY(roll, pitch, yaw);
     
     
-     
-    
-    //igor_state(2) = floorf(pitch*10000)/10000;
 
     pitchVelVector.push_back(pitch_vel);
    
@@ -133,71 +131,110 @@ void igor_l1_control::CoG_callback(const geometry_msgs::PointStamped::ConstPtr &
     //ROS_INFO("CoG angle: %f", CoG_angle_filtered);
     
     igorState(2) = CoG_PitchAngle_filtered;
+
+}// End of CoG_callback
+
+
+void igor_l1_control::odom_callback(const nav_msgs::Odometry::ConstPtr &msg)
+{
+
+    igor_pose = msg->pose; // igor pose
+    igor_twist = msg->twist; // igor twist
+    igor_position = igor_pose.pose.position; // igor linear position
+    //igor_orient = igor_pose.pose.orientation;
+    igor_linear_vel = igor_twist.twist.linear; // igor linear velocity
+    //igor_angul_vel = igor_twist.twist.angular; 
+
+
+
+    igor_pos_x = igor_position.x;
+    igor_pos_x = floorf(igor_pos_x*1000)/1000;
+    igor_vel_x = igor_linear_vel.x;  
+
+    igor_pos_y = (igor_position.y);
+    igor_pos_y = floorf(igor_pos_y*1000)/1000;
+    igor_vel_y = igor_linear_vel.y;
     
     
+    trig_vec(0) = cos(floorf(yaw*1000)/1000);
+    trig_vec(1) = sin(floorf(yaw*1000)/1000);
+    pos_vec(0,0) = igor_pos_x;
+    pos_vec(0,1) = igor_pos_y;
+    vel_vec(0,0) = igor_vel_x;
+    vel_vec(0,1) = igor_vel_y;
 
-}
+    igor_center_position = (pos_vec*trig_vec).value();
+    igor_center_vel = (vel_vec*trig_vec).value();
+   
 
-Eigen::VectorXf igor_l1_control::stateEstDot(Eigen::VectorXf stateEst, Eigen::VectorXf igorState, Eigen::Vector2f thetaHat, Eigen::Vector2f sigmaHat, Eigen::Vector2f adaptiveCntrl){
+    igorState(0) = igor_center_position;
+    igorState(3) = floorf(igor_center_vel*1000)/1000;
 
-        float igorStateNorm = igorState.lpNorm<Eigen::Infinity>(); // Infinity Norm
-        X_hat_d = Am*stateEst + Bm*(adaptiveCntrl+ thetaHat*igorStateNorm + sigmaHat);
+    //ROS_INFO("Igor Position: %f",igor_center_position);
+
+
+}// End of odom_callback
+
+Eigen::VectorXf igor_l1_control::stateEstDot(Eigen::VectorXf stateEst_, Eigen::VectorXf igorState_, Eigen::Vector2f thetaHat_, Eigen::Vector2f sigmaHat_, Eigen::Vector2f adaptiveCntrl_){
+
+        float igorStateNorm = igorState_.lpNorm<Eigen::Infinity>(); // Infinity Norm
+        X_hat_d = Am*stateEst_ + Bm*(adaptiveCntrl_+ thetaHat_*igorStateNorm + sigmaHat_);
 
         return X_hat_d;
 
 } // End of State Predictor
 
-Eigen::Vector2f igor_l1_control::thetaHatDot(Eigen::Vector2f thetaHat, Eigen::VectorXf igorState){
+Eigen::Vector2f igor_l1_control::thetaHatDot(Eigen::Vector2f thetaHat_, Eigen::VectorXf igorState_){
 
-        X_tilda = X_hat-igorState;
-        float igorStateNorm = igorState.lpNorm<Eigen::Infinity>(); // Infinity Norm
+        X_tilda = X_hat-igorState_;
+        float igorStateNorm = igorState_.lpNorm<Eigen::Infinity>(); // Infinity Norm
         Eigen::Vector2f y = -1*((X_tilda.transpose()*P*Bm).transpose())*igorStateNorm;
         int thetaGain = 1000;
         float thetaMax = 100;
         float epsilonTheta = 0.001;
 
-        thetaHat_d = thetaGain*igor_l1_control::Proj(thetaHat, y, thetaMax, epsilonTheta);
+        thetaHat_d = thetaGain*igor_l1_control::Proj(thetaHat_, y, thetaMax, epsilonTheta);
 
         return thetaHat_d;
 
 } // End of parameter estimator
 
 
-Eigen::Vector2f igor_l1_control::sigmaHatDot(Eigen::Vector2f sigmaHat, Eigen::VectorXf igorState){
+Eigen::Vector2f igor_l1_control::sigmaHatDot(Eigen::Vector2f sigmaHat_, Eigen::VectorXf igorState_){
 
-    X_tilda = X_hat-igorState;
+    X_tilda = X_hat-igorState_;
     Eigen::Vector2f y = -1*((X_tilda.transpose()*P*Bm).transpose());
 
     int sigmaGain = 1000;
     float sigmaMax = 100;
     float epsilonSigma = 0.001;
-    sigmaHat_d = sigmaGain*igor_l1_control::Proj(sigmaHat, y, sigmaMax, epsilonSigma);
+    sigmaHat_d = sigmaGain*igor_l1_control::Proj(sigmaHat_, y, sigmaMax, epsilonSigma);
 
     return sigmaHat_d;
 }
 
 
 
-Eigen::Vector2f igor_l1_control::Proj(Eigen::Vector2f theta, Eigen::Vector2f y, float thetaMax, float epsilonTheta){
+Eigen::Vector2f igor_l1_control::Proj(Eigen::Vector2f theta_, Eigen::Vector2f y_, float thetaMax_, float epsilonTheta_){
     /* This Projection operator is implemented from Naira Hovakimyan's book L1 Adaptive Control Theory. For details, please
        see Appendix B of the book.
     */
-    float fTheta = (theta.transpose()*theta-pow(thetaMax,2))/(epsilonTheta*pow(thetaMax,2));
-    Eigen::Vector2f fThetaGradient = (2/(epsilonTheta*pow(thetaMax,2)))*theta;
+    float fTheta = (theta_.transpose()*theta_-pow(thetaMax_,2))/(epsilonTheta_*pow(thetaMax_,2));
+    Eigen::Vector2f fThetaGradient = (2/(epsilonTheta_*pow(thetaMax_,2)))*theta_;
 
     if(fTheta<0){
 
-        projection = y;
+        projection = y_;
 
     }
-    else if(fTheta >= 0 && fThetaGradient.transpose()*y <= 0){
-        projection = y;
+    else if(fTheta >= 0 && fThetaGradient.transpose()*y_ <= 0){
+        projection = y_;
 
     }
 
-    else if(fTheta >= 0 && fThetaGradient.transpose()*y > 0){
+    else if(fTheta >= 0 && fThetaGradient.transpose()*y_ > 0){
 
-        projection = y-((fThetaGradient/fThetaGradient.norm())*((fThetaGradient/fThetaGradient.norm()).dot(y))*fTheta);
+        projection = y_-((fThetaGradient/fThetaGradient.norm())*((fThetaGradient/fThetaGradient.norm()).dot(y_))*fTheta);
 
     }
 

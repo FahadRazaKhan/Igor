@@ -50,17 +50,19 @@ class igor_l1_control
         ros::NodeHandle nh_; // creating ROS NodeHandle
         ros::Subscriber sub_body_imu; // creating ROS subscriber
         ros::Subscriber sub_CoG; // creating ROS subscriber
+        ros::Subscriber sub_odom; // creating ROS subscriber
 
 
         void body_imu_callback(const sensor_msgs::Imu::ConstPtr &msg);
         void CoG_callback(const geometry_msgs::PointStamped::ConstPtr &msg);
+        void odom_callback(const nav_msgs::Odometry::ConstPtr &msg);
 
 
-        Eigen::Vector2f Proj(Eigen::Vector2f theta, Eigen::Vector2f y, float thetaMax, float epsilonTheta);// Projection operator
-        Eigen::VectorXf stateEstDot(Eigen::VectorXf stateEst, Eigen::VectorXf igorState, Eigen::Vector2f thetaHat, Eigen::Vector2f sigmaHat, Eigen::Vector2f adaptiveCntrl);
+        Eigen::Vector2f Proj(Eigen::Vector2f theta_, Eigen::Vector2f y_, float thetaMax_, float epsilonTheta_);// Projection operator
+        Eigen::VectorXf stateEstDot(Eigen::VectorXf stateEst_, Eigen::VectorXf igorState_, Eigen::Vector2f thetaHat_, Eigen::Vector2f sigmaHat_, Eigen::Vector2f adaptiveCntrl_);
 
-        Eigen::Vector2f thetaHatDot(Eigen::Vector2f thetaHat, Eigen::VectorXf igorState);
-        Eigen::Vector2f sigmaHatDot(Eigen::Vector2f sigmaHat, Eigen::VectorXf igorState);
+        Eigen::Vector2f thetaHatDot(Eigen::Vector2f thetaHat_, Eigen::VectorXf igorState_);
+        Eigen::Vector2f sigmaHatDot(Eigen::Vector2f sigmaHat_, Eigen::VectorXf igorState_);
 
 
 
@@ -84,6 +86,9 @@ class igor_l1_control
         Eigen::Vector3d rightLegTranslation;
         Eigen::Vector3d leftLegTranslation;
         Eigen::Vector3d CoM_line;
+        Eigen::Vector2f trig_vec; // declaring 2X1 Eigen vector of datatype float
+        Eigen::MatrixXf pos_vec = Eigen::MatrixXf(1,2);
+        Eigen::MatrixXf vel_vec = Eigen::MatrixXf(1,2);
 
 
 
@@ -92,7 +97,11 @@ class igor_l1_control
         geometry_msgs::Vector3 igor_linear_accl;
         geometry_msgs::Point CoG_Position;
         geometry_msgs::TransformStamped leftLegTransformStamped;
-        geometry_msgs::TransformStamped rightLegTransformStamped; 
+        geometry_msgs::TransformStamped rightLegTransformStamped;
+        geometry_msgs::PoseWithCovariance igor_pose;
+        geometry_msgs::TwistWithCovariance igor_twist;
+        geometry_msgs::Point igor_position;
+        geometry_msgs::Vector3 igor_linear_vel; 
 
         tf::Quaternion quat;
         tf::Matrix3x3 pitchRotation;
@@ -112,6 +121,13 @@ class igor_l1_control
         float leanAngle = 0; 
         float CoM_height = 0;
         float CoG_PitchAngle_filtered = 0;
+
+        float igor_pos_x = 0;
+        float igor_pos_y = 0;
+        float igor_vel_x = 0;
+        float igor_vel_y = 0;
+        float igor_center_position = 0;
+        float igor_center_vel = 0;
 
 
 
