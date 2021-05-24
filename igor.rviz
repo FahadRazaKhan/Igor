@@ -65,136 +65,9 @@ Visualization Manager:
       Enabled: true
       Links:
         All Links Enabled: true
-        EndeffectorActuator:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
         Expand Joint Details: false
         Expand Link Details: false
         Expand Tree: false
-        Fore_arm:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        Fore_armActuator:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        H1_F1_base_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        H1_F1_link_1:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        H1_F1_link_2:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        H1_F1_optoforce:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        H1_F1_palm_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        H1_F1_tip:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        H1_F2_base_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        H1_F2_link_1:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        H1_F2_link_2:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        H1_F2_optoforce:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        H1_F2_palm_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        H1_F2_tip:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        H1_F3_base_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        H1_F3_link_1:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        H1_F3_link_2:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        H1_F3_optoforce:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        H1_F3_palm_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        H1_F3_tip:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        H1_base_attach:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        H1_base_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        H1_insert_F1:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        H1_insert_F2:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        H1_insert_F3:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        H1_wrist_attach:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
         L_baseActuator:
           Alpha: 1
           Show Axes: false
@@ -256,16 +129,6 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
-        Upper_arm:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        Upper_armActuator:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
         base_link:
           Alpha: 1
           Show Axes: false
@@ -279,11 +142,6 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
         chassis:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        pepsi_can:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -304,60 +162,6 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: false
-        EndeffectorActuator:
-          Value: false
-        Fore_arm:
-          Value: false
-        Fore_armActuator:
-          Value: false
-        H1_F1_base_link:
-          Value: false
-        H1_F1_link_1:
-          Value: false
-        H1_F1_link_2:
-          Value: false
-        H1_F1_optoforce:
-          Value: false
-        H1_F1_palm_link:
-          Value: false
-        H1_F1_tip:
-          Value: false
-        H1_F2_base_link:
-          Value: false
-        H1_F2_link_1:
-          Value: false
-        H1_F2_link_2:
-          Value: false
-        H1_F2_optoforce:
-          Value: false
-        H1_F2_palm_link:
-          Value: false
-        H1_F2_tip:
-          Value: false
-        H1_F3_base_link:
-          Value: false
-        H1_F3_link_1:
-          Value: false
-        H1_F3_link_2:
-          Value: false
-        H1_F3_optoforce:
-          Value: false
-        H1_F3_palm_link:
-          Value: false
-        H1_F3_tip:
-          Value: false
-        H1_base_attach:
-          Value: false
-        H1_base_link:
-          Value: false
-        H1_insert_F1:
-          Value: false
-        H1_insert_F2:
-          Value: false
-        H1_insert_F3:
-          Value: false
-        H1_wrist_attach:
-          Value: false
         L_baseActuator:
           Value: false
         L_kneeActuator:
@@ -382,10 +186,6 @@ Visualization Manager:
           Value: false
         R_wheelActuator:
           Value: false
-        Upper_arm:
-          Value: false
-        Upper_armActuator:
-          Value: false
         base_link:
           Value: false
         body_imu_link:
@@ -395,8 +195,6 @@ Visualization Manager:
         chassis:
           Value: false
         map:
-          Value: true
-        pepsi_can:
           Value: true
         robot_center_link:
           Value: true
@@ -427,40 +225,6 @@ Visualization Manager:
                       R_wheelActuator:
                         R_wheel:
                           {}
-              Upper_armActuator:
-                Upper_arm:
-                  Fore_armActuator:
-                    Fore_arm:
-                      EndeffectorActuator:
-                        H1_base_attach:
-                          H1_wrist_attach:
-                            H1_base_link:
-                              H1_insert_F1:
-                                H1_F1_palm_link:
-                                  H1_F1_base_link:
-                                    H1_F1_link_1:
-                                      H1_F1_link_2:
-                                        H1_F1_tip:
-                                          H1_F1_optoforce:
-                                            {}
-                              H1_insert_F2:
-                                H1_F2_palm_link:
-                                  H1_F2_base_link:
-                                    H1_F2_link_1:
-                                      H1_F2_link_2:
-                                        H1_F2_tip:
-                                          H1_F2_optoforce:
-                                            {}
-                              H1_insert_F3:
-                                H1_F3_palm_link:
-                                  H1_F3_base_link:
-                                    H1_F3_link_1:
-                                      H1_F3_link_2:
-                                        H1_F3_tip:
-                                          H1_F3_optoforce:
-                                            {}
-                              pepsi_can:
-                                {}
               body_imu_link:
                 {}
       Update Interval: 0
@@ -638,9 +402,9 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 1.5697963237762451
+      Pitch: 0.29979753494262695
       Target Frame: <Fixed Frame>
-      Yaw: 4.716632843017578
+      Yaw: 5.311643600463867
     Saved:
       - Class: rviz/Orbit
         Distance: 2.6209158897399902

@@ -89,6 +89,7 @@ class igor_l1_control
         Eigen::Vector2f trig_vec; // declaring 2X1 Eigen vector of datatype float
         Eigen::MatrixXf pos_vec = Eigen::MatrixXf(1,2);
         Eigen::MatrixXf vel_vec = Eigen::MatrixXf(1,2);
+        Eigen::MatrixXf Kg; //= Eigen::MatrixXf(2,6); 
 
 
 

@@ -2,7 +2,7 @@
 
 <launch>
 
- 	<arg name="model" default="Igor_armed.urdf.xacro"/>
+ 	<arg name="model" default="Igor_knee.urdf.xacro"/>
   	<arg name="paused" default="true"/>
   	<arg name="use_sim_time" default="true"/>
 	<arg name="gui" default="true"/>
@@ -60,7 +60,8 @@
 	<!--node pkg="tf" type="static_transform_publisher" name="static_broadcaster" args="-0.02 0 0.7 0 0 0 1 robot_center_link base_link 50" /-->
 	<!--node name="igor_controller" pkg="igor" type="igor_2d_controller_node" output="screen" /-->
 	<!--node name="igor_3d_controller" pkg="igor" type="igor_3d_controller_node" output="screen" /-->
-	<node name="igor_knee_controller" pkg="igor" type="igor_knee_controller_node" output="screen"/>
+	<!--node name="igor_knee_controller" pkg="igor" type="igor_knee_controller_node" output="screen"/-->
+	<node name="igor_l1_controller" pkg="igor" type="igor_l1_controller_node" output="screen"/>
 	<node name="igor_disturber" pkg="igor" type="igor_disturber_node" output="screen" launch-prefix="xterm -e"/>
 	<node name="igor_odom_broadcaster" pkg="igor" type="igor_odom_broadcaster_node" /> <!-- For Igor_knee_controller only-->
 	<!--node name="igor_test_main" pkg="igor" type="igor_test_main_node" output="screen" /-->
@@ -78,9 +79,9 @@
 				R_kfe_joint_position_controller
 				R_hfe_joint_position_controller
 				R_wheel_joint_effort_controller
-				L_wheel_joint_effort_controller
-				Upper_arm_joint_effort_controller
-				Fore_arm_joint_effort_controller">
+				L_wheel_joint_effort_controller">
+				<!--Upper_arm_joint_effort_controller
+				Fore_arm_joint_effort_controller"-->
 	</node>
 
   	<!--node name="rqt_robot_steering" pkg="rqt_robot_steering" type="rqt_robot_steering">

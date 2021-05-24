@@ -38,9 +38,95 @@ igor_l1_control::igor_l1_control(ros::NodeHandle* nodehandle):nh_(*nodehandle) /
     igorState(4) = 0;
     igorState(5) = 0;
 
+    Am(0,0) = 0;
+    Am(0,1) = 0;
+    Am(0,2) = 0;
+    Am(0,3) = 1;
+    Am(0,4) = 0;
+    Am(0,5) = 0;
+    Am(1,0) = 0;
+    Am(1,1) = 0;
+    Am(1,2) = 0;
+    Am(1,3) = 0;
+    Am(1,4) = 1;
+    Am(1,5) = 0;
+    Am(2,0) = 0;
+    Am(2,1) = 0;
+    Am(2,2) = 0;
+    Am(2,3) = 0;
+    Am(2,4) = 0;
+    Am(2,5) = 1;
+    Am(3,0) = 96.2932;
+    Am(3,1) = 0;
+    Am(3,2) = -103.8463;
+    Am(3,3) = -176.3885;
+    Am(3,4) = 0;
+    Am(3,5) = -26.4754;
+    Am(4,0) = 0;
+    Am(4,1) = -179.9585;
+    Am(4,2) = 0;
+    Am(4,3) = 0;
+    Am(4,4) = -47.8622;
+    Am(4,5) = 0;
+    Am(5,0) = -189.2728;
+    Am(5,1) = 0;
+    Am(5,2) = 219.8499;
+    Am(5,3) = 539.5515;
+    Am(5,4) = 0;
+    Am(5,5) = 52.0397; 
+
+    Bm(0,0) = 0;
+    Bm(0,1) = 0;
+    Bm(1,0) = 0;
+    Bm(1,1) = 0;
+    Bm(2,0) = 0;
+    Bm(2,1) = 0;
+    Bm(3,0) = 9.9680;
+    Bm(3,1) = 9.9680;
+    Bm(4,0) = 18.6288;
+    Bm(4,1) = -18.6288;
+    Bm(5,0) = -19.5930;
+    Bm(5,1) = -19.5930;   
+
+    P(0,0) = 5.8438;
+    P(0,1) = 0;
+    P(0,2) = 6.1219;
+    P(0,3) = -0.5;
+    P(0,4) = 0;
+    P(0,5) = 0.5759;
+    P(1,0) = 0;
+    P(1,1) = 0.1435;
+    P(1,2) = 0;
+    P(1,3) = 0;
+    P(1,4) = -0.5;
+    P(1,5) = 0;
+    P(2,0) = 6.1219;
+    P(2,1) = 0;
+    P(2,2) = 6.7821;
+    P(2,3) = -0.5759;
+    P(2,4) = 0;
+    P(2,5) = -0.5;
+    P(3,0) = -0.5;
+    P(3,1) = 0;
+    P(3,2) = -0.5759;
+    P(3,3) = 0.0721;
+    P(3,4) = 0;
+    P(3,5) = -0.0213;
+    P(4,0) = 0;
+    P(4,1) = -0.5;
+    P(4,2) = 0;
+    P(4,3) = 0;
+    P(4,4) = 1.8904;
+    P(4,5) = 0;
+    P(5,0) = 0.5759;
+    P(5,1) = 0;
+    P(5,2) = -0.5;
+    P(5,3) = -0.0213;
+    P(5,4) = 0;
+    P(5,5) = 4.4180; 
 
 
-    Eigen::MatrixXf Kg = -((C*Am.inverse()*Bm).inverse()); // Feedforward gain
+    Kg = -1*((C*Am.completeOrthogonalDecomposition().pseudoInverse()*Bm).completeOrthogonalDecomposition().pseudoInverse()); // Feedforward gain
 
 
 
@@ -128,7 +214,8 @@ void igor_l1_control::CoG_callback(const geometry_msgs::PointStamped::ConstPtr &
  
 
 
-    //ROS_INFO("CoG angle: %f", CoG_angle_filtered);
+    //ROS_INFO("CoG angle: %f", CoG_PitchAngle_filtered);
+    //std::cout << std::endl << igorState << std::endl;
     
     igorState(2) = CoG_PitchAngle_filtered;
 
@@ -250,11 +337,6 @@ Eigen::Vector2f igor_l1_control::Proj(Eigen::Vector2f theta_, Eigen::Vector2f y_
 
 
 
-
-
-
-
-
 igor_l1_control::~igor_l1_control()
 {
     std::cout<<"igor_l1_control object destroyed" << std::endl;
@@ -269,9 +351,9 @@ ros::NodeHandle nh;
 igor_l1_control myNode(&nh); // creating the igor_l1_control object
 
 ros::Duration(0.1).sleep();
-//ros::spin(); // only need for subscriber to call its callback function (Does not need for Publisher).
-ros::MultiThreadedSpinner spinner(6); // Use 6 threads for 6 callbacks in parallel
-spinner.spin(); // spin() will not return until the node has been shutdown
+ros::spin(); // only need for subscriber to call its callback function (Does not need for Publisher).
+// ros::MultiThreadedSpinner spinner(6); // Use 6 threads for 6 callbacks in parallel
+// spinner.spin(); // spin() will not return until the node has been shutdown
 
 return 0;
 

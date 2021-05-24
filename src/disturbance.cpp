@@ -15,7 +15,7 @@ void disturbance::clk_callback(const rosgraph_msgs::Clock::ConstPtr &msg){
 
     // Wrench in body frame
     force.x = 0.0;
-    force.y = -32;
+    force.y = -32*0;
     force.z = 0.0;
     moment.x = 0.0;
     moment.y = 0.0;
