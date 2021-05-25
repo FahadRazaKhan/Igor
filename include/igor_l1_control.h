@@ -41,6 +41,7 @@
 #include "rosgraph_msgs/Clock.h"
 #include <gram_savitzky_golay/gram_savitzky_golay.h> //gram_savitzky_golay lib
 #include <boost/circular_buffer.hpp>
+#include <boost/numeric/odeint.hpp> // ODE solving library
 
 
 class igor_l1_control
@@ -59,11 +60,12 @@ class igor_l1_control
 
 
         Eigen::Vector2f Proj(Eigen::Vector2f theta_, Eigen::Vector2f y_, float thetaMax_, float epsilonTheta_);// Projection operator
-        Eigen::VectorXf stateEstDot(Eigen::VectorXf stateEst_, Eigen::VectorXf igorState_, Eigen::Vector2f thetaHat_, Eigen::Vector2f sigmaHat_, Eigen::Vector2f adaptiveCntrl_);
+        Eigen::VectorXf stateEst(Eigen::VectorXf stateEst_, Eigen::VectorXf igorState_, Eigen::Vector2f thetaHat_, Eigen::Vector2f sigmaHat_, Eigen::Vector2f adaptiveCntrl_);
 
-        Eigen::Vector2f thetaHatDot(Eigen::Vector2f thetaHat_, Eigen::VectorXf igorState_);
-        Eigen::Vector2f sigmaHatDot(Eigen::Vector2f sigmaHat_, Eigen::VectorXf igorState_);
+        Eigen::Vector2f thetaHatDot(Eigen::Vector2f thetaHat_, Eigen::VectorXf igorState_, Eigen::Vector2f X_tilda_);
+        Eigen::Vector2f sigmaHatDot(Eigen::Vector2f sigmaHat_, Eigen::VectorXf igorState_, Eigen::Vector2f X_tilda_);
 
+        void adaptation(Eigen::VectorXf igorState_);
 
 
         Eigen::Vector2f projection{0,0};
@@ -129,6 +131,7 @@ class igor_l1_control
         float igor_vel_y = 0;
         float igor_center_position = 0;
         float igor_center_vel = 0;
+        float dt = 0.002;
 
 
 

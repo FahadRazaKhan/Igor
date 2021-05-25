@@ -262,20 +262,34 @@ void igor_l1_control::odom_callback(const nav_msgs::Odometry::ConstPtr &msg)
 
 }// End of odom_callback
 
-Eigen::VectorXf igor_l1_control::stateEstDot(Eigen::VectorXf stateEst_, Eigen::VectorXf igorState_, Eigen::Vector2f thetaHat_, Eigen::Vector2f sigmaHat_, Eigen::Vector2f adaptiveCntrl_){
+void igor_l1_control::adaptation(Eigen::VectorXf igorState_){
+
+    X_tilda = X_hat-igorState_;
+    thetaHat_d = this->thetaHatDot(thetaHat, igorState_, X_tilda);
+    sigmaHat_d = this->sigmaHatDot(sigmaHat, igorState_, X_tilda);
+
+    thetaHat += thetaHat_d*dt;
+    sigmaHat += sigmaHat_d*dt;  
+
+    X_hat = this->stateEst(X_hat, igorState_, thetaHat, sigmaHat, adaptiveCntrl);
+
+}// End of adaptation
+
+Eigen::VectorXf igor_l1_control::stateEst(Eigen::VectorXf stateEst_, Eigen::VectorXf igorState_, Eigen::Vector2f thetaHat_, Eigen::Vector2f sigmaHat_, Eigen::Vector2f adaptiveCntrl_){
 
         float igorStateNorm = igorState_.lpNorm<Eigen::Infinity>(); // Infinity Norm
         X_hat_d = Am*stateEst_ + Bm*(adaptiveCntrl_+ thetaHat_*igorStateNorm + sigmaHat_);
+        X_hat += X_hat_d*dt;
 
-        return X_hat_d;
+        return X_hat;
 
 } // End of State Predictor
 
-Eigen::Vector2f igor_l1_control::thetaHatDot(Eigen::Vector2f thetaHat_, Eigen::VectorXf igorState_){
+Eigen::Vector2f igor_l1_control::thetaHatDot(Eigen::Vector2f thetaHat_, Eigen::VectorXf igorState_, Eigen::Vector2f X_tilda_){
 
-        X_tilda = X_hat-igorState_;
+        
         float igorStateNorm = igorState_.lpNorm<Eigen::Infinity>(); // Infinity Norm
-        Eigen::Vector2f y = -1*((X_tilda.transpose()*P*Bm).transpose())*igorStateNorm;
+        Eigen::Vector2f y = -1*((X_tilda_.transpose()*P*Bm).transpose())*igorStateNorm;
         int thetaGain = 1000;
         float thetaMax = 100;
         float epsilonTheta = 0.001;
@@ -287,10 +301,10 @@ Eigen::Vector2f igor_l1_control::thetaHatDot(Eigen::Vector2f thetaHat_, Eigen::V
 } // End of parameter estimator
 
 
-Eigen::Vector2f igor_l1_control::sigmaHatDot(Eigen::Vector2f sigmaHat_, Eigen::VectorXf igorState_){
+Eigen::Vector2f igor_l1_control::sigmaHatDot(Eigen::Vector2f sigmaHat_, Eigen::VectorXf igorState_, Eigen::Vector2f X_tilda_){
 
-    X_tilda = X_hat-igorState_;
-    Eigen::Vector2f y = -1*((X_tilda.transpose()*P*Bm).transpose());
+    //X_tilda = X_hat-igorState_;
+    Eigen::Vector2f y = -1*((X_tilda_.transpose()*P*Bm).transpose());
 
     int sigmaGain = 1000;
     float sigmaMax = 100;
@@ -298,7 +312,7 @@ Eigen::Vector2f igor_l1_control::sigmaHatDot(Eigen::Vector2f sigmaHat_, Eigen::V
     sigmaHat_d = sigmaGain*igor_l1_control::Proj(sigmaHat_, y, sigmaMax, epsilonSigma);
 
     return sigmaHat_d;
-}
+} // End of Sigma estimator
 
 
 
