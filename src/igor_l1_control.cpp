@@ -125,10 +125,23 @@ igor_l1_control::igor_l1_control(ros::NodeHandle* nodehandle):nh_(*nodehandle) /
     P(5,4) = 0;
     P(5,5) = 4.4180; 
 
+    // Reference states
+    refState(0) = 0; // Center Position 
+    refState(1) = 0; // Yaw
+    refState(2) = 0; // Pitch
+    refState(3) = 0; // Center velocity
+    refState(4) = 0; // yaw velocity
+    refState(5) = 0; // Pitch velocity
 
-    Kg = -1*((C*Am.completeOrthogonalDecomposition().pseudoInverse()*Bm).completeOrthogonalDecomposition().pseudoInverse()); // Feedforward gain
 
+    Am_Inv = Am.completeOrthogonalDecomposition().pseudoInverse();
+    Kg = (C*Am_Inv*Bm).completeOrthogonalDecomposition().pseudoInverse(); // Feedforward gain
+    Kg = -1*Kg;
 
+    rg = Kg*refState;
+
+    BiQuad bq1(0.0001416, 0.0002832, 0.0001416, -1.966, 0.967); // Digital filter
+    BiQuad bq2(0.0001416, 0.0002832, 0.0001416, -1.966, 0.967); // Digital filter
 
 }// End of Constructor
 
@@ -215,7 +228,9 @@ void igor_l1_control::CoG_callback(const geometry_msgs::PointStamped::ConstPtr &
 
 
     //ROS_INFO("CoG angle: %f", CoG_PitchAngle_filtered);
-    //std::cout << std::endl << igorState << std::endl;
+    std::cout << "rg:" << std::endl << rg << std::endl;
+    std::cout << "Bm:" << std::endl << Bm << std::endl;
+    std::cout << "Am_Inv:" << std::endl << Am_Inv << std::endl;
     
     igorState(2) = CoG_PitchAngle_filtered;
 
@@ -266,7 +281,7 @@ void igor_l1_control::adaptation(Eigen::VectorXf igorState_){
 
     X_tilda = X_hat-igorState_;
     thetaHat_d = this->thetaHatDot(thetaHat, igorState_, X_tilda);
-    sigmaHat_d = this->sigmaHatDot(sigmaHat, igorState_, X_tilda);
+    sigmaHat_d = this->sigmaHatDot(sigmaHat, X_tilda);
 
     thetaHat += thetaHat_d*dt;
     sigmaHat += sigmaHat_d*dt;  
@@ -301,9 +316,9 @@ Eigen::Vector2f igor_l1_control::thetaHatDot(Eigen::Vector2f thetaHat_, Eigen::V
 } // End of parameter estimator
 
 
-Eigen::Vector2f igor_l1_control::sigmaHatDot(Eigen::Vector2f sigmaHat_, Eigen::VectorXf igorState_, Eigen::Vector2f X_tilda_){
+Eigen::Vector2f igor_l1_control::sigmaHatDot(Eigen::Vector2f sigmaHat_, Eigen::Vector2f X_tilda_){
 
-    //X_tilda = X_hat-igorState_;
+   
     Eigen::Vector2f y = -1*((X_tilda_.transpose()*P*Bm).transpose());
 
     int sigmaGain = 1000;
@@ -313,6 +328,12 @@ Eigen::Vector2f igor_l1_control::sigmaHatDot(Eigen::Vector2f sigmaHat_, Eigen::V
 
     return sigmaHat_d;
 } // End of Sigma estimator
+
+// Eigen::MatrixXf igor_l1_control::omegaHatDot(Eigen::Vector2f omegaHat_, Eigen::Vector2f X_tilda_, Eigen::Vector2f adaptiveCntrl_){
+
+//     Eigen::MatrixXf y = -1*((X_tilda_.transpose()*P*Bm).transpose()*adaptiveCntrl_.transpose());
+
+// }
 
 
 
@@ -348,7 +369,12 @@ Eigen::Vector2f igor_l1_control::Proj(Eigen::Vector2f theta_, Eigen::Vector2f y_
 } // End of Projector
 
 
+Eigen::Vector2f igor_l1_control::controlInput(Eigen::VectorXf igorState_, Eigen::Vector2f thetaHat_){
 
+    float igorStateNorm = igorState_.lpNorm<Eigen::Infinity>(); // Infinity Norm
+    Eigen::Vector2f eita = omegaHat*adaptiveCntrl + thetaHat_*igorStateNorm;
+
+ } // End of Controller
 
 
 igor_l1_control::~igor_l1_control()

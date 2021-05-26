@@ -42,6 +42,7 @@
 #include <gram_savitzky_golay/gram_savitzky_golay.h> //gram_savitzky_golay lib
 #include <boost/circular_buffer.hpp>
 #include <boost/numeric/odeint.hpp> // ODE solving library
+#include "BiQuad.h"
 
 
 class igor_l1_control
@@ -63,10 +64,11 @@ class igor_l1_control
         Eigen::VectorXf stateEst(Eigen::VectorXf stateEst_, Eigen::VectorXf igorState_, Eigen::Vector2f thetaHat_, Eigen::Vector2f sigmaHat_, Eigen::Vector2f adaptiveCntrl_);
 
         Eigen::Vector2f thetaHatDot(Eigen::Vector2f thetaHat_, Eigen::VectorXf igorState_, Eigen::Vector2f X_tilda_);
-        Eigen::Vector2f sigmaHatDot(Eigen::Vector2f sigmaHat_, Eigen::VectorXf igorState_, Eigen::Vector2f X_tilda_);
+        Eigen::Vector2f sigmaHatDot(Eigen::Vector2f sigmaHat_, Eigen::Vector2f X_tilda_);
+        //Eigen::MatrixXf omegaHatDot(Eigen::Vector2f omegaHat_, Eigen::Vector2f X_tilda_, Eigen::Vector2f adaptiveCntrl_);
 
         void adaptation(Eigen::VectorXf igorState_);
-
+        Eigen::Vector2f controlInput(Eigen::VectorXf igorState_, Eigen::Vector2f thetaHat_);
 
         Eigen::Vector2f projection{0,0};
         Eigen::VectorXf X_hat = Eigen::VectorXf(6); //X_hat
@@ -77,8 +79,11 @@ class igor_l1_control
         Eigen::Vector2f thetaHat_d{0,0}; // Parameter estimate rate
         Eigen::Vector2f sigmaHat{0,0}; // Sigma estimate
         Eigen::Vector2f sigmaHat_d{0,0}; // Sigma estimate rate
+        Eigen::MatrixXf omegaHat = Eigen::MatrixXf::Identity(2,2);
+        Eigen::MatrixXf omegaHat_d = Eigen::MatrixXf::Zero(2,2);
         Eigen::Vector2f adaptiveCntrl{0,0}; // Adaptive control inputs
         Eigen::MatrixXf Am = Eigen::MatrixXf(6,6);
+        Eigen::MatrixXf Am_Inv = Eigen::MatrixXf(6,6);
         Eigen::MatrixXf Bm = Eigen::MatrixXf(6,2);
         Eigen::MatrixXf C = Eigen::MatrixXf::Identity(6,6);
         Eigen::MatrixXf P = Eigen::MatrixXf(6,6);
@@ -91,7 +96,9 @@ class igor_l1_control
         Eigen::Vector2f trig_vec; // declaring 2X1 Eigen vector of datatype float
         Eigen::MatrixXf pos_vec = Eigen::MatrixXf(1,2);
         Eigen::MatrixXf vel_vec = Eigen::MatrixXf(1,2);
-        Eigen::MatrixXf Kg; //= Eigen::MatrixXf(2,6); 
+        Eigen::MatrixXf Kg;// = Eigen::MatrixXf(2,6);
+        Eigen::VectorXf refState = Eigen::VectorXf(6);
+        Eigen::MatrixXf rg; 
 
 
 
@@ -132,6 +139,8 @@ class igor_l1_control
         float igor_center_position = 0;
         float igor_center_vel = 0;
         float dt = 0.002;
+
+        
 
 
 

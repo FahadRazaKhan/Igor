@@ -31,6 +31,7 @@ find_package(catkin REQUIRED COMPONENTS
 
 ##find_package(iir)
 find_package(gram_savitzky_golay REQUIRED)
+#find_package(control REQUIRED)
 
 
 ## System dependencies are found with CMake's conventions
@@ -124,7 +125,7 @@ find_package(gram_savitzky_golay REQUIRED)
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
   INCLUDE_DIRS include
-#  LIBRARIES igor
+  #LIBRARIES igor
   CATKIN_DEPENDS roscpp rospy std_msgs tf sensor_msgs geometry_msgs nav_msgs message_filters rosgraph_msgs gazebo_msgs tf_conversions visualization_msgs hebi_cpp_api
 #  DEPENDS system_lib
 )
@@ -153,6 +154,9 @@ add_library(igor_states_lib
    src/igor_states.cpp
 ) ## My library
 
+add_library(BiQuad_lib
+   src/BiQuad.cpp
+) ## My library
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -227,7 +231,7 @@ target_link_libraries(igorHW_controller_node
    ${catkin_LIBRARIES} gram_savitzky_golay)
    
 target_link_libraries(igor_l1_controller_node
-   ${catkin_LIBRARIES} gram_savitzky_golay)
+   ${catkin_LIBRARIES} gram_savitzky_golay BiQuad_lib)
 #############
 ## Install ##
 #############
