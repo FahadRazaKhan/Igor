@@ -9,6 +9,9 @@ igor_l1_control::igor_l1_control(ros::NodeHandle* nodehandle):nh_(*nodehandle) /
     sub_CoG = nh_.subscribe<geometry_msgs::PointStamped>("/cog/robot",1, &igor_l1_control::CoG_callback,this);
     sub_odom = nh_.subscribe<nav_msgs::Odometry>("/igor/odom",1, &igor_l1_control::odom_callback,this,ros::TransportHints().tcpNoDelay());
 
+    Lwheel_pub = nh_.advertise<std_msgs::Float64>( "/igor/L_wheel_joint_effort_controller/command", 1 );
+    Rwheel_pub = nh_.advertise<std_msgs::Float64>( "/igor/R_wheel_joint_effort_controller/command", 1 );
+    plotPublisher = nh_.advertise<std_msgs::Float32MultiArray>( "/igor/plotingVec", 5);
     // Vector Initialization 
     X_hat(0) = 0;
     X_hat(1) = 0;
@@ -17,12 +20,26 @@ igor_l1_control::igor_l1_control(ros::NodeHandle* nodehandle):nh_(*nodehandle) /
     X_hat(4) = 0;
     X_hat(5) = 0;
 
+    X_hat_last(0) = 0;
+    X_hat_last(1) = 0;
+    X_hat_last(2) = 0;
+    X_hat_last(3) = 0;
+    X_hat_last(4) = 0;
+    X_hat_last(5) = 0;
+
     X_hat_d(0) = 0;
     X_hat_d(1) = 0;
     X_hat_d(2) = 0;
     X_hat_d(3) = 0;
     X_hat_d(4) = 0;
     X_hat_d(5) = 0;
+
+    X_hat_d_last(0) = 0;
+    X_hat_d_last(1) = 0;
+    X_hat_d_last(2) = 0;
+    X_hat_d_last(3) = 0;
+    X_hat_d_last(4) = 0;
+    X_hat_d_last(5) = 0;
 
     X_tilda(0) = 0;
     X_tilda(1) = 0;
@@ -38,42 +55,42 @@ igor_l1_control::igor_l1_control(ros::NodeHandle* nodehandle):nh_(*nodehandle) /
     igorState(4) = 0;
     igorState(5) = 0;
 
-    Am(0,0) = 0;
-    Am(0,1) = 0;
-    Am(0,2) = 0;
-    Am(0,3) = 1;
-    Am(0,4) = 0;
-    Am(0,5) = 0;
-    Am(1,0) = 0;
-    Am(1,1) = 0;
-    Am(1,2) = 0;
-    Am(1,3) = 0;
-    Am(1,4) = 1;
-    Am(1,5) = 0;
-    Am(2,0) = 0;
-    Am(2,1) = 0;
-    Am(2,2) = 0;
-    Am(2,3) = 0;
-    Am(2,4) = 0;
-    Am(2,5) = 1;
-    Am(3,0) = 96.2932;
-    Am(3,1) = 0;
-    Am(3,2) = -103.8463;
-    Am(3,3) = -176.3885;
-    Am(3,4) = 0;
-    Am(3,5) = -26.4754;
-    Am(4,0) = 0;
-    Am(4,1) = -179.9585;
-    Am(4,2) = 0;
-    Am(4,3) = 0;
-    Am(4,4) = -47.8622;
-    Am(4,5) = 0;
-    Am(5,0) = -189.2728;
-    Am(5,1) = 0;
-    Am(5,2) = 219.8499;
-    Am(5,3) = 539.5515;
-    Am(5,4) = 0;
-    Am(5,5) = 52.0397; 
+    // Am(0,0) = 0;
+    // Am(0,1) = 0;
+    // Am(0,2) = 0;
+    // Am(0,3) = 1;
+    // Am(0,4) = 0;
+    // Am(0,5) = 0;
+    // Am(1,0) = 0;
+    // Am(1,1) = 0;
+    // Am(1,2) = 0;
+    // Am(1,3) = 0;
+    // Am(1,4) = 1;
+    // Am(1,5) = 0;
+    // Am(2,0) = 0;
+    // Am(2,1) = 0;
+    // Am(2,2) = 0;
+    // Am(2,3) = 0;
+    // Am(2,4) = 0;
+    // Am(2,5) = 1;
+    // Am(3,0) = 96.2932;
+    // Am(3,1) = 0;
+    // Am(3,2) = -103.8463;
+    // Am(3,3) = -176.3885;
+    // Am(3,4) = 0;
+    // Am(3,5) = -26.4754;
+    // Am(4,0) = 0;
+    // Am(4,1) = -179.9585;
+    // Am(4,2) = 0;
+    // Am(4,3) = 0;
+    // Am(4,4) = -47.8622;
+    // Am(4,5) = 0;
+    // Am(5,0) = -189.2728;
+    // Am(5,1) = 0;
+    // Am(5,2) = 219.8499;
+    // Am(5,3) = 539.5515;
+    // Am(5,4) = 0;
+    // Am(5,5) = 52.0397; 
 
     Bm(0,0) = 0;
     Bm(0,1) = 0;
@@ -81,49 +98,49 @@ igor_l1_control::igor_l1_control(ros::NodeHandle* nodehandle):nh_(*nodehandle) /
     Bm(1,1) = 0;
     Bm(2,0) = 0;
     Bm(2,1) = 0;
-    Bm(3,0) = 9.9680;
-    Bm(3,1) = 9.9680;
-    Bm(4,0) = 18.6288;
-    Bm(4,1) = -18.6288;
-    Bm(5,0) = -19.5930;
-    Bm(5,1) = -19.5930;   
+    Bm(3,0) = 1;//9.9680;
+    Bm(3,1) = 1;//9.9680;
+    Bm(4,0) = 1;//18.6288;
+    Bm(4,1) = -1;//-18.6288;
+    Bm(5,0) = -1;//-19.5930;
+    Bm(5,1) = -1;//-19.5930;   
 
-    P(0,0) = 5.8438;
+    P(0,0) = 0.0009346;//14.6917;
     P(0,1) = 0;
-    P(0,2) = 6.1219;
-    P(0,3) = -0.5;
+    P(0,2) = 0;//-2.2093;
+    P(0,3) = 0;//-0.2574;
     P(0,4) = 0;
-    P(0,5) = 0.5759;
+    P(0,5) = 0;//-0.1283;
     P(1,0) = 0;
-    P(1,1) = 0.1435;
+    P(1,1) = 0.0009346;//2.0234;
     P(1,2) = 0;
     P(1,3) = 0;
-    P(1,4) = -0.5;
+    P(1,4) = 0;//0.0028;
     P(1,5) = 0;
-    P(2,0) = 6.1219;
+    P(2,0) = 0;//-2.2093;
     P(2,1) = 0;
-    P(2,2) = 6.7821;
-    P(2,3) = -0.5759;
+    P(2,2) = 0.0009346;//2.1285;
+    P(2,3) = 0;//0.1523;
     P(2,4) = 0;
-    P(2,5) = -0.5;
-    P(3,0) = -0.5;
+    P(2,5) = 0;//0.0697;
+    P(3,0) = 0;//-0.2574;
     P(3,1) = 0;
-    P(3,2) = -0.5759;
-    P(3,3) = 0.0721;
+    P(3,2) = 0;//0.1523;
+    P(3,3) = 0.0009346;//0.2631;
     P(3,4) = 0;
-    P(3,5) = -0.0213;
+    P(3,5) = 0;//0.0856;
     P(4,0) = 0;
-    P(4,1) = -0.5;
+    P(4,1) = 0;//0.0028;
     P(4,2) = 0;
     P(4,3) = 0;
-    P(4,4) = 1.8904;
+    P(4,4) = 0.0009346;//0.0105;
     P(4,5) = 0;
-    P(5,0) = 0.5759;
+    P(5,0) = 0;//-0.1283;
     P(5,1) = 0;
-    P(5,2) = -0.5;
-    P(5,3) = -0.0213;
+    P(5,2) = 0;//0.0697;
+    P(5,3) = 0;//0.0856;
     P(5,4) = 0;
-    P(5,5) = 4.4180; 
+    P(5,5) = 0.0009346;//0.0326; 
 
     // Reference states
     refState(0) = 0; // Center Position 
@@ -138,10 +155,23 @@ igor_l1_control::igor_l1_control(ros::NodeHandle* nodehandle):nh_(*nodehandle) /
     Kg = (C*Am_Inv*Bm).completeOrthogonalDecomposition().pseudoInverse(); // Feedforward gain
     Kg = -1*Kg;
 
-    rg = Kg*refState;
+    PlotingVector.data.resize(12); // Resizing std::msg array
 
-    BiQuad bq1(0.0001416, 0.0002832, 0.0001416, -1.966, 0.967); // Digital filter
-    BiQuad bq2(0.0001416, 0.0002832, 0.0001416, -1.966, 0.967); // Digital filter
+    k_r(0,0)= k_l(0,0) = 4*(-0.7071); // Forward position gain -ve
+    k_r(0,1)= 2*(0.7071); // Yaw gain +ve
+    k_r(0,2)= k_l(0,2) = 1.2*(-16.2331); // Pitch gain -ve
+    k_r(0,3)= k_l(0,3) = (-4.8849); // Forward speed gain -ve
+    k_r(0,4)= (0.4032); // Yaw speed gain +ve
+    k_r(0,5)= k_l(0,5)= 1.5*(-3.1893); // Pitch speed gain -ve
+    k_l(0,1)= -1*k_r(0,1);
+    k_l(0,4)= -1*k_r(0,4);
+    
+
+ 
+    //BiQuad bq2(0.0001416, 0.0002832, 0.0001416, -1.966, 0.967); // Digital filter
+
+    // FilterOut.reserve(2);
+    
 
 }// End of Constructor
 
@@ -228,9 +258,9 @@ void igor_l1_control::CoG_callback(const geometry_msgs::PointStamped::ConstPtr &
 
 
     //ROS_INFO("CoG angle: %f", CoG_PitchAngle_filtered);
-    std::cout << "rg:" << std::endl << rg << std::endl;
-    std::cout << "Bm:" << std::endl << Bm << std::endl;
-    std::cout << "Am_Inv:" << std::endl << Am_Inv << std::endl;
+    // std::cout << "Kg:" << std::endl << Kg << std::endl;
+    // std::cout << "Bm:" << std::endl << Bm << std::endl;
+    // std::cout << "Am:" << std::endl << Am << std::endl;
     
     igorState(2) = CoG_PitchAngle_filtered;
 
@@ -274,107 +304,221 @@ void igor_l1_control::odom_callback(const nav_msgs::Odometry::ConstPtr &msg)
 
     //ROS_INFO("Igor Position: %f",igor_center_position);
 
+    this->adaptation(igorState);
+    this->lqr_controller(igorState);
 
 }// End of odom_callback
 
 void igor_l1_control::adaptation(Eigen::VectorXf igorState_){
 
     X_tilda = X_hat-igorState_;
-    thetaHat_d = this->thetaHatDot(thetaHat, igorState_, X_tilda);
-    sigmaHat_d = this->sigmaHatDot(sigmaHat, X_tilda);
-
-    thetaHat += thetaHat_d*dt;
-    sigmaHat += sigmaHat_d*dt;  
+    // std::cout << "X_tilda: " << std::endl <<  X_tilda << std::endl;
+    PlotingVector.data[0] = igorState_(0);
+    PlotingVector.data[1] = igorState_(1);
+    PlotingVector.data[2] = igorState_(2);
+    PlotingVector.data[3] = igorState_(3);
+    PlotingVector.data[4] = igorState_(4);
+    PlotingVector.data[5] = igorState_(5);
 
     X_hat = this->stateEst(X_hat, igorState_, thetaHat, sigmaHat, adaptiveCntrl);
+    PlotingVector.data[6] = X_hat(0);
+    PlotingVector.data[7] = X_hat(1);
+    PlotingVector.data[8] = X_hat(2);
+    PlotingVector.data[9] = X_hat(3);
+    PlotingVector.data[10] = X_hat(4);
+    PlotingVector.data[11] = X_hat(5);
+    // std::cout << "thetaHat:" << std::endl << thetaHat  << std::endl;
+    thetaHat = this->thetaHatDot(thetaHat, igorState_, X_tilda);
+    sigmaHat = this->sigmaHatDot(sigmaHat, X_tilda);
+
+
+    
+    adaptiveCntrl = this->controlInput(igorState_, thetaHat, sigmaHat);
+    // trq_r.data = adaptiveCntrl(0);
+    // trq_l.data = adaptiveCntrl(1); 
+    // Lwheel_pub.publish(trq_l); // Publish left wheel torque
+    // Rwheel_pub.publish(trq_r); // Publish right wheel torque
+    
+    //std::cout << "X_hat" << std::endl << X_hat << std::endl;
+    
+    // std::cout << "sigmaHat:" << std::endl << sigmaHat  << std::endl;
+    // std::cout << "Control Vector:" << std::endl << adaptiveCntrl << std::endl;
+    // std::cout << "Time step:" << std::endl << dt << std::endl;
+
+    plotPublisher.publish(PlotingVector);
 
 }// End of adaptation
 
 Eigen::VectorXf igor_l1_control::stateEst(Eigen::VectorXf stateEst_, Eigen::VectorXf igorState_, Eigen::Vector2f thetaHat_, Eigen::Vector2f sigmaHat_, Eigen::Vector2f adaptiveCntrl_){
 
-        float igorStateNorm = igorState_.lpNorm<Eigen::Infinity>(); // Infinity Norm
-        X_hat_d = Am*stateEst_ + Bm*(adaptiveCntrl_+ thetaHat_*igorStateNorm + sigmaHat_);
-        X_hat += X_hat_d*dt;
-
-        return X_hat;
+    //ROS_INFO("In stateEst");
+    float igorStateNorm = igorState_.lpNorm<Eigen::Infinity>(); // Infinity Norm
+    X_hat_d = (Am*stateEst_) + Bm*(adaptiveCntrl_+ thetaHat_*igorStateNorm + sigmaHat_);
+    // Trapezoidal method Integration
+    X_hat  = X_hat_last + (dt*(X_hat_d+X_hat_d_last)/2);
+    X_hat_last = X_hat;
+    X_hat_d_last = X_hat_d;
+    return X_hat;
 
 } // End of State Predictor
 
-Eigen::Vector2f igor_l1_control::thetaHatDot(Eigen::Vector2f thetaHat_, Eigen::VectorXf igorState_, Eigen::Vector2f X_tilda_){
+Eigen::Vector2f igor_l1_control::thetaHatDot(Eigen::Vector2f thetaHat_, Eigen::VectorXf igorState_, Eigen::VectorXf X_tilda_){
 
-        
-        float igorStateNorm = igorState_.lpNorm<Eigen::Infinity>(); // Infinity Norm
-        Eigen::Vector2f y = -1*((X_tilda_.transpose()*P*Bm).transpose())*igorStateNorm;
-        int thetaGain = 1000;
-        float thetaMax = 100;
-        float epsilonTheta = 0.001;
+    //ROS_INFO("In thetaHatDot");
+    float igorStateNorm = igorState_.lpNorm<Eigen::Infinity>(); // Infinity Norm
+    Eigen::Vector2f y = ((X_tilda_.transpose()*P*Bm).transpose())*igorStateNorm;
+    y = -1*y;
+    int thetaGain = 100000;
+    float thetaMax = 300;
+    float epsilonTheta = 0.1;
 
-        thetaHat_d = thetaGain*igor_l1_control::Proj(thetaHat_, y, thetaMax, epsilonTheta);
+    Eigen::Vector2f thetaProjection = this->Proj(thetaHat_, y, thetaMax, epsilonTheta);
 
-        return thetaHat_d;
+    thetaHat_d = thetaGain*thetaProjection;
+
+    // Trapezoidal method Integration
+    thetaHat  = thetaHat_last + (dt*(thetaHat_d+thetaHat_d_last)/2);
+    thetaHat_last = thetaHat;
+    thetaHat_d_last = thetaHat_d;
+
+    // std::cout << "state Norm:" << std::endl << igorStateNorm << std::endl;
+    // std::cout << "thetaProjection: " << std::endl << thetaProjection << std::endl;
+    return thetaHat;
 
 } // End of parameter estimator
 
 
-Eigen::Vector2f igor_l1_control::sigmaHatDot(Eigen::Vector2f sigmaHat_, Eigen::Vector2f X_tilda_){
+Eigen::Vector2f igor_l1_control::sigmaHatDot(Eigen::Vector2f sigmaHat_, Eigen::VectorXf X_tilda_){
 
-   
-    Eigen::Vector2f y = -1*((X_tilda_.transpose()*P*Bm).transpose());
-
+    //ROS_INFO("In sigmaHatDot");
+    Eigen::Vector2f y = ((X_tilda_.transpose()*P*Bm).transpose());
+    y = -1*y;
     int sigmaGain = 1000;
-    float sigmaMax = 100;
-    float epsilonSigma = 0.001;
-    sigmaHat_d = sigmaGain*igor_l1_control::Proj(sigmaHat_, y, sigmaMax, epsilonSigma);
+    float sigmaMax = 10;
+    float epsilonSigma = 0.1;
+    sigmaHat_d = sigmaGain*(this->Proj(sigmaHat_, y, sigmaMax, epsilonSigma));
 
-    return sigmaHat_d;
+    // Trapezoidal method Integration
+    sigmaHat  = sigmaHat_last + (dt*(sigmaHat_d + sigmaHat_d_last)/2);
+    sigmaHat_last = sigmaHat;
+    sigmaHat_d_last = sigmaHat_d;
+
+    // std::cout << "sigma Y:" << std::endl << y << std::endl;
+    // std::cout << "sigmaHat_d:" << std::endl << sigmaHat_d << std::endl;
+    return sigmaHat;
 } // End of Sigma estimator
 
-// Eigen::MatrixXf igor_l1_control::omegaHatDot(Eigen::Vector2f omegaHat_, Eigen::Vector2f X_tilda_, Eigen::Vector2f adaptiveCntrl_){
 
-//     Eigen::MatrixXf y = -1*((X_tilda_.transpose()*P*Bm).transpose()*adaptiveCntrl_.transpose());
+Eigen::Vector2f igor_l1_control::controlInput(Eigen::VectorXf igorState_, Eigen::Vector2f thetaHat_, Eigen::Vector2f sigmaHat_){
 
-// }
+    ROS_INFO("In controlInput");
+    rg = Kg*refState;
+    float igorStateNorm = igorState_.lpNorm<Eigen::Infinity>(); // Infinity Norm
+    Eigen::Vector2f eita = adaptiveCntrl + (thetaHat_*igorStateNorm)+ sigmaHat_;
+    filterInput = (eita-rg);
+    float controlInput_1 = bq1.step(filterInput(0));
+    float controlInput_2 = bq2.step(filterInput(1));
+    Eigen::Vector2f controlInput;
+    controlInput(0) = -6*controlInput_1;
+    controlInput(1) = -6*controlInput_2;
+    
+    return controlInput;
+
+ } // End of Controller
 
 
+ void igor_l1_control::lqr_controller (Eigen::VectorXf vec) //LQR State-feedback controller
+{
+    ROS_INFO("In LQR");
+    //ROS_INFO("Pitch angle: %f", igor_state(2));
+
+    if (igorState(2)>= -0.35 && igorState(2) <= 0.35){
+        
+        //igor_knee_control::ref_update();
+
+        trq_r.data =  (k_r*(refState-vec)).value(); // taking the scalar value of the eigen-matrx
+      
+        trq_l.data =  (k_l*(refState-vec)).value();
+        
+
+        Lwheel_pub.publish(trq_l); // Publish left wheel torque
+        Rwheel_pub.publish(trq_r); // Publish right wheel torque
+
+    
+
+       
+    }
+    else if (igorState(2)<= -1.4 || igorState(2) >= 1.4){
+        trq_r.data = 0;
+        trq_l.data = 0;
+        Lwheel_pub.publish(trq_l);
+        Rwheel_pub.publish(trq_r);
+        
+        // ROS_INFO("Reseting Model");
+        // ros::Duration(0.5).sleep(); // sleep for half a second
+        // client.call(srv); // Calling the service to reset robot model in gazebo
+    }
+
+    
+} // End of lqr_controller
 
 Eigen::Vector2f igor_l1_control::Proj(Eigen::Vector2f theta_, Eigen::Vector2f y_, float thetaMax_, float epsilonTheta_){
     /* This Projection operator is implemented from Naira Hovakimyan's book L1 Adaptive Control Theory. For details, please
        see Appendix B of the book.
     */
-    float fTheta = (theta_.transpose()*theta_-pow(thetaMax_,2))/(epsilonTheta_*pow(thetaMax_,2));
-    Eigen::Vector2f fThetaGradient = (2/(epsilonTheta_*pow(thetaMax_,2)))*theta_;
+    //ROS_INFO("In Projection Operator");
+
+    Eigen::Vector2f projection;
+
+    float fTheta_Num = ((1+epsilonTheta_)*(theta_.dot(theta_)))-(pow(thetaMax_,2));
+    float fTheta_Den = epsilonTheta_*(pow(thetaMax_,2));
+    float fTheta = fTheta_Num/fTheta_Den;
+    // ROS_INFO("fTheta %f: ",fTheta);
+    // std::cout << "Projection Y: " << std::endl << y_ << std::endl;
+    float fthetaGradientCoeff = 2*(epsilonTheta_+1)/(epsilonTheta_*pow(thetaMax_,2));
+    Eigen::Vector2f fThetaGradient = fthetaGradientCoeff*theta_;
+    Eigen::Vector2f fThetaGradientTrans = fThetaGradient.transpose();
+    float fThetaGradientNorm = fThetaGradient.norm();
+    float fGradDotY = fThetaGradient.dot(y_);
+
+    // std::cout << "fGradDotY:" << std::endl << fGradDotY << std::endl;
+    // std::cout << "fThetaGradient:" << std::endl << fThetaGradient << std::endl;
+    // std::cout << "fThetaGradientTranspose:" << std::endl << fThetaGradientTrans << std::endl;
+    // std::cout << "fThetaGradientNorm:" << std::endl << fThetaGradientNorm << std::endl;
 
     if(fTheta<0){
 
+        ROS_INFO("fTheta < 0 ");
         projection = y_;
 
     }
-    else if(fTheta >= 0 && fThetaGradient.transpose()*y_ <= 0){
+    else if(fTheta >= 0 && fGradDotY<= 0){
+        ROS_INFO("fTheta >= 0 &&  fGradDotY<= 0");
         projection = y_;
 
     }
 
-    else if(fTheta >= 0 && fThetaGradient.transpose()*y_ > 0){
+    else if(fTheta>=0 && fGradDotY>0){
 
-        projection = y_-((fThetaGradient/fThetaGradient.norm())*((fThetaGradient/fThetaGradient.norm()).dot(y_))*fTheta);
+        ROS_INFO("fTheta >= 0 && fGradDotY> 0");
+
+        projection = y_-((fThetaGradient/fThetaGradientNorm)*((fThetaGradient/fThetaGradientNorm).dot(y_))*fTheta);
 
     }
 
     else{
+
+        ROS_INFO("In else");
         projection(0) = 0;
         projection(1) = 0;
     }
 
+    std::cout << "Projection:" << std::endl << projection << std::endl;
     return projection;
 } // End of Projector
 
 
-Eigen::Vector2f igor_l1_control::controlInput(Eigen::VectorXf igorState_, Eigen::Vector2f thetaHat_){
 
-    float igorStateNorm = igorState_.lpNorm<Eigen::Infinity>(); // Infinity Norm
-    Eigen::Vector2f eita = omegaHat*adaptiveCntrl + thetaHat_*igorStateNorm;
-
- } // End of Controller
 
 
 igor_l1_control::~igor_l1_control()
@@ -391,9 +535,9 @@ ros::NodeHandle nh;
 igor_l1_control myNode(&nh); // creating the igor_l1_control object
 
 ros::Duration(0.1).sleep();
-ros::spin(); // only need for subscriber to call its callback function (Does not need for Publisher).
-// ros::MultiThreadedSpinner spinner(6); // Use 6 threads for 6 callbacks in parallel
-// spinner.spin(); // spin() will not return until the node has been shutdown
+//ros::spin(); // only need for subscriber to call its callback function (Does not need for Publisher).
+ros::MultiThreadedSpinner spinner(3); // Use 6 threads for 6 callbacks in parallel
+spinner.spin(); // spin() will not return until the node has been shutdown
 
 return 0;
 

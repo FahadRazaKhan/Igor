@@ -30,8 +30,8 @@ find_package(catkin REQUIRED COMPONENTS
 #find_package(gazebo REQUIRED)
 
 ##find_package(iir)
-find_package(gram_savitzky_golay REQUIRED)
-#find_package(control REQUIRED)
+#find_package(gram_savitzky_golay REQUIRED)
+
 
 
 ## System dependencies are found with CMake's conventions
