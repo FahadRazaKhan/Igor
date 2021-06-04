@@ -305,7 +305,7 @@ void igor_l1_control::odom_callback(const nav_msgs::Odometry::ConstPtr &msg)
     //ROS_INFO("Igor Position: %f",igor_center_position);
 
     this->adaptation(igorState);
-    this->lqr_controller(igorState);
+    // this->lqr_controller(igorState);
 
 }// End of odom_callback
 
@@ -324,9 +324,9 @@ void igor_l1_control::adaptation(Eigen::VectorXf igorState_){
     PlotingVector.data[6] = X_hat(0);
     PlotingVector.data[7] = X_hat(1);
     PlotingVector.data[8] = X_hat(2);
-    PlotingVector.data[9] = X_hat(3);
-    PlotingVector.data[10] = X_hat(4);
-    PlotingVector.data[11] = X_hat(5);
+    // PlotingVector.data[9] = X_hat(3);
+    // PlotingVector.data[10] = X_hat(4);
+    // PlotingVector.data[11] = X_hat(5);
     // std::cout << "thetaHat:" << std::endl << thetaHat  << std::endl;
     thetaHat = this->thetaHatDot(thetaHat, igorState_, X_tilda);
     sigmaHat = this->sigmaHatDot(sigmaHat, X_tilda);
@@ -334,10 +334,12 @@ void igor_l1_control::adaptation(Eigen::VectorXf igorState_){
 
     
     adaptiveCntrl = this->controlInput(igorState_, thetaHat, sigmaHat);
-    // trq_r.data = adaptiveCntrl(0);
-    // trq_l.data = adaptiveCntrl(1); 
-    // Lwheel_pub.publish(trq_l); // Publish left wheel torque
-    // Rwheel_pub.publish(trq_r); // Publish right wheel torque
+    trq_r.data = adaptiveCntrl(0);
+    trq_l.data = adaptiveCntrl(1);
+    // PlotingVector.data[10] =  adaptiveCntrl(0);
+    // PlotingVector.data[11] =  adaptiveCntrl(1);
+    Lwheel_pub.publish(trq_l); // Publish left wheel torque
+    Rwheel_pub.publish(trq_r); // Publish right wheel torque
     
     //std::cout << "X_hat" << std::endl << X_hat << std::endl;
     
@@ -368,6 +370,7 @@ Eigen::Vector2f igor_l1_control::thetaHatDot(Eigen::Vector2f thetaHat_, Eigen::V
     float igorStateNorm = igorState_.lpNorm<Eigen::Infinity>(); // Infinity Norm
     Eigen::Vector2f y = ((X_tilda_.transpose()*P*Bm).transpose())*igorStateNorm;
     y = -1*y;
+   
     int thetaGain = 100000;
     float thetaMax = 300;
     float epsilonTheta = 0.1;
@@ -393,6 +396,8 @@ Eigen::Vector2f igor_l1_control::sigmaHatDot(Eigen::Vector2f sigmaHat_, Eigen::V
     //ROS_INFO("In sigmaHatDot");
     Eigen::Vector2f y = ((X_tilda_.transpose()*P*Bm).transpose());
     y = -1*y;
+    PlotingVector.data[10] =  y(0);
+    PlotingVector.data[11] =  y(1);
     int sigmaGain = 1000;
     float sigmaMax = 10;
     float epsilonSigma = 0.1;
@@ -453,10 +458,6 @@ Eigen::Vector2f igor_l1_control::controlInput(Eigen::VectorXf igorState_, Eigen:
         trq_l.data = 0;
         Lwheel_pub.publish(trq_l);
         Rwheel_pub.publish(trq_r);
-        
-        // ROS_INFO("Reseting Model");
-        // ros::Duration(0.5).sleep(); // sleep for half a second
-        // client.call(srv); // Calling the service to reset robot model in gazebo
     }
 
     
@@ -514,8 +515,36 @@ Eigen::Vector2f igor_l1_control::Proj(Eigen::Vector2f theta_, Eigen::Vector2f y_
     }
 
     std::cout << "Projection:" << std::endl << projection << std::endl;
+    std::cout << "ProjectionNorm:" << std::endl << projection.lpNorm<Eigen::Infinity>() << std::endl;
+    PlotingVector.data[9] = projection.lpNorm<Eigen::Infinity>();
     return projection;
 } // End of Projector
+
+float igor_l1_control::Proj2(float theta_, float y_, float Pm_, float PBar_, float epsilon_){
+
+    float Psi = (2/epsilon_) * (pow((theta_-PBar_)/Pm_,2)-1+epsilon_);
+    float PsiGradient = (4/epsilon_)*((theta_-PBar_)/Pm_);
+    float projection = 0;
+    float AbsPsiGrad = abs(PsiGradient);
+
+    if(Psi <= 0){
+
+        projection = y_;
+
+    }
+    else if (Psi >= 0 && (PsiGradient*y_)<=0 ){
+
+        projection = y_;
+
+    }
+
+    else{
+
+        projection = y_-((Psi*PsiGradient*y_*PsiGradient)/pow(AbsPsiGrad,2));
+    }
+
+    return projection;
+}
 
 
 

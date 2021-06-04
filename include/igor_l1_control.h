@@ -66,6 +66,7 @@ class igor_l1_control
 
 
         Eigen::Vector2f Proj(Eigen::Vector2f theta_, Eigen::Vector2f y_, float thetaMax_, float epsilonTheta_);// Projection operator
+        float Proj2(float theta_, float y_, float Pm_, float PBar_, float epsilon_);// Projection operator
         Eigen::VectorXf stateEst(Eigen::VectorXf stateEst_, Eigen::VectorXf igorState_, Eigen::Vector2f thetaHat_, Eigen::Vector2f sigmaHat_, Eigen::Vector2f adaptiveCntrl_);
 
         Eigen::Vector2f thetaHatDot(Eigen::Vector2f thetaHat_, Eigen::VectorXf igorState_, Eigen::VectorXf X_tilda_);
