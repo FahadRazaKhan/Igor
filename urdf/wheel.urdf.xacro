@@ -48,7 +48,7 @@
 			<xacro:insert_block name="joint_pose"/>
 			<parent link="${prefix}_wheelActuator"/>
 			<child  link="${prefix}_wheel"/>
-			<limit effort="5" velocity="20"/>  <!-- effort limit in N (prismatic) or N.m (revolute), Velocity limit in m/s or rad/s -->
+			<limit effort="500" velocity="50"/>  <!-- effort limit in N (prismatic) or N.m (revolute), Velocity limit in m/s or rad/s -->
 			<axis xyz="0 1 0"/>
 			<dynamics damping="${damping}" friction="${static_friction}"/>
 		</joint>

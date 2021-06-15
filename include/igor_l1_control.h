@@ -62,43 +62,46 @@ class igor_l1_control
         void body_imu_callback(const sensor_msgs::Imu::ConstPtr &msg);
         void CoG_callback(const geometry_msgs::PointStamped::ConstPtr &msg);
         void odom_callback(const nav_msgs::Odometry::ConstPtr &msg);
-        void lqr_controller(Eigen::VectorXf eig_vec);
+
+        // void lqr_controller(Eigen::VectorXf eig_vec);
 
 
         Eigen::Vector2f Proj(Eigen::Vector2f theta_, Eigen::Vector2f y_, float thetaMax_, float epsilonTheta_);// Projection operator
         float Proj2(float theta_, float y_, float Pm_, float PBar_, float epsilon_);// Projection operator
-        Eigen::VectorXf stateEst(Eigen::VectorXf stateEst_, Eigen::VectorXf igorState_, Eigen::Vector2f thetaHat_, Eigen::Vector2f sigmaHat_, Eigen::Vector2f adaptiveCntrl_);
+        Eigen::VectorXf stateEst(Eigen::VectorXf stateEst_, Eigen::VectorXf igorState_, Eigen::Vector2f thetaHat_, float sigmaHat_, float omegaHat_, float adaptiveCntrl_);
 
         Eigen::Vector2f thetaHatDot(Eigen::Vector2f thetaHat_, Eigen::VectorXf igorState_, Eigen::VectorXf X_tilda_);
-        Eigen::Vector2f sigmaHatDot(Eigen::Vector2f sigmaHat_, Eigen::VectorXf X_tilda_);
-        //Eigen::MatrixXf omegaHatDot(Eigen::Vector2f omegaHat_, Eigen::Vector2f X_tilda_, Eigen::Vector2f adaptiveCntrl_);
+        float sigmaHatDot(float sigmaHat_, Eigen::VectorXf X_tilda_);
+        float omegaHatDot(float omegaHat_, Eigen::VectorXf X_tilda_, float adaptiveCntrl_);
 
         void adaptation(Eigen::VectorXf igorState_);
-        Eigen::Vector2f controlInput(Eigen::VectorXf igorState_, Eigen::Vector2f thetaHat_, Eigen::Vector2f sigmaHat_);
+        float controlInput(Eigen::VectorXf igorState_, Eigen::Vector2f thetaHat_, float sigmaHat_, float omegaHat_);
 
 
-        Eigen::VectorXf X_hat = Eigen::VectorXf(6); //X_hat
-        Eigen::VectorXf X_hat_last = Eigen::VectorXf(6); //X_hat_previous
-        Eigen::VectorXf X_hat_d = Eigen::VectorXf(6); //X_hat_dot
-        Eigen::VectorXf X_hat_d_last = Eigen::VectorXf(6); //X_hat_dot_previous
-        Eigen::VectorXf igorState = Eigen::VectorXf(6); // Real system states
-        Eigen::VectorXf X_tilda = Eigen::VectorXf(6); // State error
+        Eigen::VectorXf X_hat = Eigen::VectorXf(2); //X_hat
+        Eigen::VectorXf X_hat_last = Eigen::VectorXf(2); //X_hat_previous
+        Eigen::VectorXf X_hat_d = Eigen::VectorXf(2); //X_hat_dot
+        Eigen::VectorXf X_hat_d_last = Eigen::VectorXf(2); //X_hat_dot_previous
+        Eigen::VectorXf igorState = Eigen::VectorXf(2); // Real system states
+        Eigen::VectorXf X_tilda = Eigen::VectorXf(2); // State error
         Eigen::Vector2f thetaHat{0,0}; // Parameter estimate
         Eigen::Vector2f thetaHat_last{0,0}; // Parameter estimate previous
         Eigen::Vector2f thetaHat_d{0,0}; // Parameter estimate rate
         Eigen::Vector2f thetaHat_d_last{0,0}; // Parameter estimate rate previous
-        Eigen::Vector2f sigmaHat{0,0}; // Sigma estimate
-        Eigen::Vector2f sigmaHat_last{0,0}; // Sigma estimate previous
-        Eigen::Vector2f sigmaHat_d{0,0}; // Sigma estimate rate
-        Eigen::Vector2f sigmaHat_d_last{0,0}; // Sigma estimate rate previous
-        Eigen::MatrixXf omegaHat = Eigen::MatrixXf::Identity(2,2);
-        Eigen::MatrixXf omegaHat_d = Eigen::MatrixXf::Zero(2,2);
-        Eigen::Vector2f adaptiveCntrl{0,0}; // Adaptive control inputs
-        Eigen::MatrixXf Am = -535*(Eigen::MatrixXf::Identity(6,6));
-        Eigen::MatrixXf Am_Inv = Eigen::MatrixXf(6,6);
+        float sigmaHat = 0; // Sigma estimate
+        float sigmaHat_last = 0; // Sigma estimate previous
+        float sigmaHat_d = 0; // Sigma estimate rate
+        float sigmaHat_d_last = 0; // Sigma estimate rate previous
+        float omegaHat = 0.00001;
+        float omegaHat_last = 0.00001;
+        float omegaHat_d = 0;
+        float omegaHat_d_last = 0;
+        float adaptiveCntrl = 0; // Adaptive control inputs
+        Eigen::MatrixXf Am = Eigen::MatrixXf(2,2);//-535*(Eigen::MatrixXf::Identity(6,6));
+        Eigen::MatrixXf Am_Inv = Eigen::MatrixXf(2,2);
         Eigen::MatrixXf Bm = Eigen::MatrixXf(6,2);
-        Eigen::MatrixXf C = Eigen::MatrixXf::Identity(6,6);
-        Eigen::MatrixXf P = Eigen::MatrixXf(6,6);
+        Eigen::Vector2f C{1,0};
+        Eigen::MatrixXf P = Eigen::MatrixXf(2,2);
         Eigen::Vector3d CoM_vec;
         Eigen::Matrix3d pitchRotEigen;
         Eigen::Vector3d groundPoint;
@@ -108,12 +111,14 @@ class igor_l1_control
         Eigen::Vector2f trig_vec; // declaring 2X1 Eigen vector of datatype float
         Eigen::MatrixXf pos_vec = Eigen::MatrixXf(1,2);
         Eigen::MatrixXf vel_vec = Eigen::MatrixXf(1,2);
-        Eigen::MatrixXf Kg;// = Eigen::MatrixXf(2,6);
-        Eigen::VectorXf refState = Eigen::VectorXf(6);
-        Eigen::MatrixXf rg; 
+        float Kg = 0;
+        float refState = 0; //Eigen::VectorXf(2);
+        float rg = 0; 
         Eigen::Vector2f filterInput{0,0};
         Eigen::MatrixXf k_r = Eigen::MatrixXf(1,6); // declaring 1X6 Eigen matrix of datatype float
         Eigen::MatrixXf k_l = Eigen::MatrixXf(1,6); // declaring 1X6 Eigen matrix of datatype float
+
+        Eigen::Vector2f b{0,-0.3914};
 
         std::vector<decltype(thetaHat)::value_type> FilterOut;
        
@@ -161,9 +166,13 @@ class igor_l1_control
         float igor_center_vel = 0;
         float dt = 0.002;
 
+        float last_filt_out = 0;
+        float last_filt_in = 0;
+        
         
         BiQuad bq1{0.0001416, 0.0002832, 0.0001416, -1.966, 0.967};
         BiQuad bq2{0.0001416, 0.0002832, 0.0001416, -1.966, 0.967};
+        BiQuad bq3{0, 0.0003955,0.0003911, -1.966, 0.967};
 
 
     public:
