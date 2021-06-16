@@ -105,14 +105,14 @@ igor_l1_control::igor_l1_control(ros::NodeHandle* nodehandle):nh_(*nodehandle) /
     // Bm(5,0) = -1;//-19.5930;
     // Bm(5,1) = -1;//-19.5930;   
 
-    P(0,0) = 1.6089;//14.6917;
+    P(0,0) = 1.6089;
     P(0,1) = 0.0033;
     // P(0,2) = 0;//-2.2093;
     // P(0,3) = 0;//-0.2574;
     // P(0,4) = 0;
     // P(0,5) = 0;//-0.1283;
     P(1,0) = 0.0033;
-    P(1,1) = 0.0012;//2.0234;
+    P(1,1) = 0.0012;
     // P(1,2) = 0;
     // P(1,3) = 0;
     // P(1,4) = 0;//0.0028;
@@ -154,7 +154,7 @@ igor_l1_control::igor_l1_control(ros::NodeHandle* nodehandle):nh_(*nodehandle) /
     Am_Inv = Am.completeOrthogonalDecomposition().pseudoInverse();
     // Kg = (C*Am_Inv*Bm).completeOrthogonalDecomposition().pseudoInverse(); // Feedforward gain
     // Kg = -1*Kg;
-    Kg = -383.2258;
+    Kg = -375;
 
     PlotingVector.data.resize(12); // Resizing std::msg array
 
@@ -375,7 +375,7 @@ Eigen::Vector2f igor_l1_control::thetaHatDot(Eigen::Vector2f thetaHat_, Eigen::V
     Eigen::Vector2f y = X_tilda_.transpose()*P*b*igorState_;//(Bm.transpose())*P*X_tilda_*igorStateNorm;
     y = -1*y;
    
-    int thetaGain = 800000;
+    int thetaGain = 100000;
     // float thetaMax = 300;
     float epsilonTheta = 0.5;
     float thetaPm = 400;
@@ -406,8 +406,8 @@ float igor_l1_control::sigmaHatDot(float sigmaHat_, Eigen::VectorXf X_tilda_){
     y = -1*y;
     // PlotingVector.data[10] =  y(0);
     // PlotingVector.data[11] =  y(1);
-    int sigmaGain = 100000;
-    float sigmaMax = 10;
+    int sigmaGain = 30000;
+    //float sigmaMax = 10;
     float epsilonSigma = 0.5;
     float sigmaPm = 20; // Max/Min
     float sigmaPBar = 0; // mean value
@@ -429,7 +429,7 @@ float igor_l1_control::omegaHatDot(float omegaHat_, Eigen::VectorXf X_tilda_, fl
 
     float y = (X_tilda_.transpose()*P*b); 
     y = -1*y*adaptiveCntrl_;
-    int omegaGain = 100000;
+    int omegaGain = 10000;
     float epsilonOmega = 0.1;
     float omegaPm = 10; // Max/Min
     float omegaPBar = 0; // mean value

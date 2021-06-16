@@ -118,7 +118,7 @@ class igor_l1_control
         Eigen::MatrixXf k_r = Eigen::MatrixXf(1,6); // declaring 1X6 Eigen matrix of datatype float
         Eigen::MatrixXf k_l = Eigen::MatrixXf(1,6); // declaring 1X6 Eigen matrix of datatype float
 
-        Eigen::Vector2f b{0,-0.3914};
+        Eigen::Vector2f b{0,-0.4};
 
         std::vector<decltype(thetaHat)::value_type> FilterOut;
        
