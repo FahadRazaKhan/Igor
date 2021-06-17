@@ -461,11 +461,7 @@ float igor_l1_control::controlInput(Eigen::VectorXf igorState_, Eigen::Vector2f 
     float eita = (omegaHat_*adaptiveCntrl) + (thetaHat_.transpose()*igorState_)+ sigmaHat_;
     float filterInput = (eita-rg);
     
-    float filt_out = 0.09516*last_filt_in + 0.9048*last_filt_out;
-    last_filt_out = filt_out;
-    last_filt_in = filterInput;
-
-    float controlInput_1 = -1*filt_out;
+    float controlInput_1 = -1*bq3.step(filterInput);
     // float controlInput_2 = bq2.step(filterInput(1));
     // Eigen::Vector2f controlInput;
     // controlInput(0) = -6*controlInput_1;

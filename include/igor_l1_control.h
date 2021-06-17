@@ -166,13 +166,11 @@ class igor_l1_control
         float igor_center_vel = 0;
         float dt = 0.002;
 
-        float last_filt_out = 0;
-        float last_filt_in = 0;
         
         
         BiQuad bq1{0.0001416, 0.0002832, 0.0001416, -1.966, 0.967};
         BiQuad bq2{0.0001416, 0.0002832, 0.0001416, -1.966, 0.967};
-        BiQuad bq3{0, 0.0003955,0.0003911, -1.966, 0.967};
+        BiQuad bq3{0.0, 0.09516, 0.0, -0.9048, 0.0};
 
 
     public:
